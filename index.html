@@ -142,6 +142,7 @@
             <nav class="hidden md:flex space-x-8 font-semibold">
                 <a href="#home" class="text-gray-600 hover:text-brand-pink transition duration-300">Home</a>
                 <a href="#catalog" class="text-gray-600 hover:text-brand-pink transition duration-300">Catalog</a>
+                <a href="#track-order" class="text-gray-600 hover:text-brand-pink transition duration-300">Track Order</a>
                 <a href="#suggestions" class="text-gray-600 hover:text-brand-pink transition duration-300">Suggestions</a>
                 <a href="#game" class="text-gray-600 hover:text-brand-pink transition duration-300">Fun Zone</a>
                 <a href="#contact" class="text-gray-600 hover:text-brand-pink transition duration-300">Contact</a>
@@ -154,6 +155,7 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white">
             <a href="#home" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Home</a>
             <a href="#catalog" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Catalog</a>
+            <a href="#track-order" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Track Order</a>
             <a href="#suggestions" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Suggestions</a>
             <a href="#game" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Fun Zone</a>
             <a href="#contact" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Contact</a>
@@ -197,6 +199,23 @@
             </div>
         </section>
         
+        <!-- Track Order Section -->
+        <section id="track-order" class="py-20 bg-brand-yellow/20">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Track Your <span class="font-pacifico text-brand-orange">Order</span></h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Enter the phone number you used to place the order to see its status.</p>
+                <div class="mt-10 max-w-xl mx-auto">
+                    <form id="track-order-form" class="bg-white p-8 rounded-2xl shadow-lg flex flex-col sm:flex-row gap-4">
+                        <input type="tel" id="track-phone-input" class="w-full p-4 border-2 border-gray-200 rounded-full focus:ring-2 focus:ring-brand-orange focus:border-transparent transition" placeholder="Enter your 10-digit phone number">
+                        <button type="submit" class="btn-style bg-brand-orange/80 text-white font-bold px-8 py-3 text-lg">Track Order</button>
+                    </form>
+                    <div id="order-status-results" class="mt-6">
+                        <!-- Order status will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Suggestions Section -->
         <section id="suggestions" class="py-20 bg-brand-teal/10">
             <div class="container mx-auto px-6 text-center">
@@ -257,8 +276,8 @@
                 <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">For party orders, questions, or just to share your love for sweets!</p>
                 <div class="mt-10 max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border-t-8 border-brand-yellow">
                     <p class="text-gray-700">Drop us a message on WhatsApp:</p>
-                    <a href="https://wa.me/919137734564" target="_blank" class="mt-4 inline-block text-2xl font-bold text-green-500 hover:text-green-600 transition">
-                        <i class="fab fa-whatsapp mr-2"></i> +91 9137734564
+                    <a href="https://wa.me/919313011448" target="_blank" class="mt-4 inline-block text-2xl font-bold text-green-500 hover:text-green-600 transition">
+                        <i class="fab fa-whatsapp mr-2"></i> +91 9313011448
                     </a>
                     <p class="mt-6 text-gray-700">Or email us at:</p>
                     <a href="mailto:getitopen12345@gmail.com" class="mt-1 inline-block text-lg font-semibold text-brand-pink hover:underline">
@@ -349,7 +368,7 @@
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', function() {
             // --- DOM Elements ---
@@ -380,6 +399,9 @@
             const gameBoard = document.getElementById('game-board');
             const statusDisplay = document.getElementById('status');
             const resetButton = document.getElementById('reset-button');
+            const trackOrderForm = document.getElementById('track-order-form');
+            const trackPhoneInput = document.getElementById('track-phone-input');
+            const orderStatusResults = document.getElementById('order-status-results');
             
             let sweetsData = []; // This will be populated from Firestore
             let cart = [];
@@ -473,17 +495,17 @@
                     const card = document.createElement('div');
                     card.className = `bg-white rounded-xl shadow-lg p-6 text-center flex flex-col justify-between border-b-8 border-brand-pink`;
                     
-                    const availabilityBadge = sweet.inStock ? `<span class="absolute top-0 left-0 mt-3 ml-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">In Stock</span>` : `<span class="absolute top-0 left-0 mt-3 ml-3 bg-gray-400 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>`;
+                    const availabilityBadge = sweet.inStock ? `<span class="absolute top-0 left-0 mt-3 ml-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">In Stock (${sweet.quantity || 0})</span>` : `<span class="absolute top-0 left-0 mt-3 ml-3 bg-gray-400 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>`;
                     const bestSellerBadge = sweet.bestSeller ? `<span class="absolute top-0 right-0 mt-3 mr-3 bg-brand-yellow text-gray-900 text-xs font-bold px-3 py-1 rounded-full animate-pulse">Best Seller</span>` : '';
                     const priceDisplay = `₹${sweet.price} / ${sweet.unit}`;
 
                     let actionArea = '';
-                    if (sweet.inStock) {
+                    if (sweet.inStock && sweet.quantity > 0) {
                         if (sweet.unit === 'piece') {
                             actionArea = `
                                 <div class="flex items-center justify-center space-x-3">
                                     <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="-1">-</button>
-                                    <input type="number" value="1" min="1" class="quantity-input w-16 h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
+                                    <input type="number" value="1" min="1" max="${sweet.quantity}" class="quantity-input w-16 h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
                                     <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="1">+</button>
                                 </div>
                                 <button class="add-to-cart-piece w-full mt-3 btn-style bg-brand-pink/80 text-white font-semibold py-3" data-id="${sweet.id}">Add to Cart</button>
@@ -495,7 +517,7 @@
                                     <button class="unit-toggle active w-full rounded-full px-4 py-1 text-sm font-bold" data-id="${sweet.id}" data-unit="kg">kg</button>
                                 </div>
                                 <div class="flex items-center justify-center space-x-2">
-                                    <input type="number" value="0.25" step="0.25" min="0.25" class="quantity-input w-full h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
+                                    <input type="number" value="0.25" step="0.25" min="0.25" max="${sweet.quantity}" class="quantity-input w-full h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
                                 </div>
                                 <button class="add-to-cart-weight w-full mt-3 btn-style bg-brand-pink/80 text-white font-semibold py-3" data-id="${sweet.id}">Add to Cart</button>
                             `;
@@ -675,6 +697,60 @@
                 } catch (error) {
                     console.error("Error placing order: ", error);
                     alert("Sorry, there was an issue placing your order. Please try again.");
+                }
+            });
+
+            trackOrderForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const phone = trackPhoneInput.value.trim();
+                if (phone.length < 10) {
+                    orderStatusResults.innerHTML = `<p class="text-red-500">Please enter a valid 10-digit phone number.</p>`;
+                    return;
+                }
+                orderStatusResults.innerHTML = `<p class="text-gray-500">Searching for your orders...</p>`;
+
+                try {
+                    const ordersCollection = collection(db, `/artifacts/${appId}/public/data/orders`);
+                    const q = query(ordersCollection, where("customer.phone", "==", phone));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        orderStatusResults.innerHTML = `<p class="text-center text-gray-600 bg-white p-4 rounded-lg shadow">No orders found for this phone number.</p>`;
+                        return;
+                    }
+
+                    let resultsHtml = '';
+                    const sortedDocs = querySnapshot.docs.sort((a, b) => (b.data().createdAt?.seconds || 0) - (a.data().createdAt?.seconds || 0));
+
+                    sortedDocs.forEach(doc => {
+                        const order = doc.data();
+                        const orderTime = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : 'N/A';
+                        let statusClass = '';
+                        switch(order.status) {
+                            case 'pending': statusClass = 'bg-yellow-200 text-yellow-800'; break;
+                            case 'confirmed': statusClass = 'bg-blue-200 text-blue-800'; break;
+                            case 'completed': statusClass = 'bg-green-200 text-green-800'; break;
+                            default: statusClass = 'bg-gray-200 text-gray-800';
+                        }
+
+                        resultsHtml += `
+                            <div class="bg-white p-4 rounded-lg shadow text-left mb-4">
+                                <div class="flex justify-between items-center">
+                                    <p class="font-bold">Order from ${orderTime}</p>
+                                    <span class="${statusClass} text-xs font-medium px-2.5 py-0.5 rounded-full capitalize">${order.status}</span>
+                                </div>
+                                <ul class="list-disc list-inside mt-2 text-gray-600">
+                                    ${order.items.map(item => `<li>${item.name} (${item.displayQuantity})</li>`).join('')}
+                                </ul>
+                                <p class="text-right font-bold mt-2">Total: ₹${order.subtotal.toFixed(2)}</p>
+                            </div>
+                        `;
+                    });
+                    orderStatusResults.innerHTML = resultsHtml;
+
+                } catch (error) {
+                    console.error("Error tracking order:", error);
+                    orderStatusResults.innerHTML = `<p class="text-red-500">Could not fetch orders. Please try again later.</p>`;
                 }
             });
 
