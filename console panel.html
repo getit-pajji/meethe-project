@@ -43,6 +43,7 @@
                     <thead>
                         <tr class="bg-gray-100">
                             <th class="p-3">Order Time</th>
+                            <th class="p-3">Customer Details</th>
                             <th class="p-3">Items</th>
                             <th class="p-3">Total</th>
                             <th class="p-3">Status</th>
@@ -51,7 +52,7 @@
                     </thead>
                     <tbody id="orders-table-body">
                         <!-- Orders will be loaded here -->
-                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading orders...</td></tr>
+                        <tr><td colspan="6" class="p-4 text-center text-gray-500">Connecting to database...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -76,7 +77,7 @@
                     </thead>
                     <tbody id="sweets-table-body">
                         <!-- Sweets will be loaded here -->
-                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading sweets...</td></tr>
+                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Connecting to database...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -87,7 +88,7 @@
             <h2 class="text-2xl font-bold mb-4">Customer Suggestions</h2>
             <div id="suggestions-list" class="space-y-3 max-h-96 overflow-y-auto">
                 <!-- Suggestions will be loaded here -->
-                <p class="text-center text-gray-500">Loading suggestions...</p>
+                <p class="text-center text-gray-500">Connecting to database...</p>
             </div>
         </section>
     </div>
@@ -149,298 +150,352 @@
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase Configuration ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "your-fallback-key", authDomain: "your-fallback-domain", projectId: "your-fallback-project-id" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DOM Elements ---
+            const appContainer = document.getElementById('app-container');
+            const sweetsTableBody = document.getElementById('sweets-table-body');
+            const suggestionsList = document.getElementById('suggestions-list');
+            const ordersTableBody = document.getElementById('orders-table-body');
+            const modal = document.getElementById('sweet-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const sweetForm = document.getElementById('sweet-form');
+            const addSweetBtn = document.getElementById('add-sweet-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const generateDescBtn = document.getElementById('generate-desc-btn');
 
-        // --- Initialize Firebase ---
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+            // --- Main App Function ---
+            async function main() {
+                // =================================================================================
+                // YOUR FIREBASE CONFIGURATION OBJECT
+                // =================================================================================
+                const firebaseConfig = {
+                  apiKey: "AIzaSyCYusn8iUJhiQHKBKFnIgzo82pY4fXjc38",
+                  authDomain: "meethe-275ef.firebaseapp.com",
+                  projectId: "meethe-275ef",
+                  storageBucket: "meethe-275ef.appspot.com",
+                  messagingSenderId: "841227918612",
+                  appId: "1:841227918612:web:715d9d6a3051a00a023601",
+                  measurementId: "G-CX9SGS1K01"
+                };
+                // =================================================================================
+                
+                const appId = 'meethe-sweets-app'; // A unique ID for your app's data
 
-        // --- Collections ---
-        let sweetsCollection;
-        let suggestionsCollection;
-        let ordersCollection;
-
-        // --- DOM Elements ---
-        const sweetsTableBody = document.getElementById('sweets-table-body');
-        const suggestionsList = document.getElementById('suggestions-list');
-        const ordersTableBody = document.getElementById('orders-table-body');
-        const modal = document.getElementById('sweet-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const sweetForm = document.getElementById('sweet-form');
-        const addSweetBtn = document.getElementById('add-sweet-btn');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const generateDescBtn = document.getElementById('generate-desc-btn');
-
-        // --- Modal Management ---
-        const openModal = () => modal.classList.add('active');
-        const closeModal = () => {
-            modal.classList.remove('active');
-            sweetForm.reset();
-            document.getElementById('sweet-id').value = '';
-        };
-
-        addSweetBtn.addEventListener('click', () => {
-            modalTitle.textContent = 'Add New Sweet';
-            openModal();
-        });
-        cancelBtn.addEventListener('click', closeModal);
-
-        // --- Main Authentication and Data Loading Function ---
-        async function main() {
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                console.log("Admin authenticated with UID:", auth.currentUser.uid);
-
-                sweetsCollection = collection(db, `/artifacts/${appId}/public/data/sweets`);
-                suggestionsCollection = collection(db, `/artifacts/${appId}/public/data/suggestions`);
-                ordersCollection = collection(db, `/artifacts/${appId}/public/data/orders`);
-
-                loadSweets();
-                loadSuggestions();
-                loadOrders();
-
-            } catch (error) {
-                console.error("Authentication or data loading failed:", error);
-                sweetsTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error: Could not connect to the database. ${error.message}</td></tr>`;
-                suggestionsList.innerHTML = `<p class="text-center text-red-500">Could not load suggestions.</p>`;
-            }
-        }
-
-        // --- Load and Display Orders ---
-        function loadOrders() {
-            onSnapshot(ordersCollection, (snapshot) => {
-                ordersTableBody.innerHTML = '';
-                if (snapshot.empty) {
-                    ordersTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No current orders.</td></tr>';
+                if (!firebaseConfig || !firebaseConfig.apiKey) {
+                    console.error("Firebase config is missing!");
+                    appContainer.innerHTML = '<div class="text-red-500 text-center p-8">Error: Firebase configuration is missing. Please paste your `firebaseConfig` object into the script.</div>';
                     return;
                 }
-                snapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt).forEach(doc => {
-                    const order = doc.data();
-                    if (order.status === 'completed') return; // Don't show completed orders
 
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b hover:bg-gray-50';
-                    
-                    const itemsHtml = order.items.map(item => `<div>${item.name} (x${item.displayQuantity})</div>`).join('');
-                    const orderTime = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleTimeString() : 'N/A';
+                // --- Initialize Firebase ---
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
 
-                    tr.innerHTML = `
-                        <td class="p-3">${orderTime}</td>
-                        <td class="p-3 text-sm">${itemsHtml}</td>
-                        <td class="p-3 font-bold">₹${order.subtotal.toFixed(2)}</td>
-                        <td class="p-3"><span class="bg-yellow-200 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Pending</span></td>
-                        <td class="p-3">
-                            <button class="complete-order-btn bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600" data-id="${doc.id}">Complete</button>
-                        </td>
-                    `;
-                    ordersTableBody.appendChild(tr);
+                // --- Collections ---
+                let sweetsCollection;
+                let suggestionsCollection;
+                let ordersCollection;
+
+                // --- Modal Management ---
+                const openModal = () => modal.classList.add('active');
+                const closeModal = () => {
+                    modal.classList.remove('active');
+                    sweetForm.reset();
+                    document.getElementById('sweet-id').value = '';
+                };
+
+                addSweetBtn.addEventListener('click', () => {
+                    modalTitle.textContent = 'Add New Sweet';
+                    openModal();
                 });
-            }, (error) => {
-                console.error("Error fetching orders: ", error);
-                ordersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error loading orders: ${error.message}</td></tr>`;
-            });
-        }
+                cancelBtn.addEventListener('click', closeModal);
 
-        // --- Load and Display Sweets ---
-        function loadSweets() {
-            onSnapshot(sweetsCollection, (snapshot) => {
-                sweetsTableBody.innerHTML = '';
-                if (snapshot.empty) {
-                    sweetsTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No sweets found. Add one to get started!</td></tr>';
-                    return;
-                }
-                snapshot.forEach(doc => {
-                    const sweet = doc.data();
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b hover:bg-gray-50';
-                    tr.innerHTML = `
-                        <td class="p-3">${sweet.name}</td>
-                        <td class="p-3">₹${sweet.price}</td>
-                        <td class="p-3">${sweet.unit}</td>
-                        <td class="p-3">
-                            <span class="inline-block w-4 h-4 rounded-full ${sweet.inStock ? 'bg-green-500' : 'bg-red-500'}"></span>
-                        </td>
-                        <td class="p-3 space-x-2">
-                            <button class="edit-btn text-blue-600 hover:text-blue-800" data-id="${doc.id}"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn text-red-600 hover:text-red-800" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
-                        </td>
-                    `;
-                    sweetsTableBody.appendChild(tr);
+                // --- Authentication and Data Loading ---
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        console.log("Admin authenticated with UID:", user.uid);
+                        // Define collection paths after authentication
+                        sweetsCollection = collection(db, `/artifacts/${appId}/public/data/sweets`);
+                        suggestionsCollection = collection(db, `/artifacts/${appId}/public/data/suggestions`);
+                        ordersCollection = collection(db, `/artifacts/${appId}/public/data/orders`);
+
+                        loadSweets();
+                        loadSuggestions();
+                        loadOrders();
+                    }
                 });
-            }, (error) => {
-                console.error("Error fetching sweets: ", error);
-                 sweetsTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error loading sweets: ${error.message}</td></tr>`;
-            });
-        }
 
-        // --- Load and Display Suggestions ---
-        function loadSuggestions() {
-            onSnapshot(suggestionsCollection, (snapshot) => {
-                suggestionsList.innerHTML = '';
-                 if (snapshot.empty) {
-                    suggestionsList.innerHTML = '<p class="text-center text-gray-500">No suggestions yet.</p>';
-                    return;
-                }
-                snapshot.forEach(doc => {
-                    const suggestion = doc.data();
-                    const div = document.createElement('div');
-                    div.className = 'bg-gray-100 p-3 rounded-md';
-                    div.textContent = suggestion.text;
-                    suggestionsList.appendChild(div);
-                });
-            }, (error) => {
-                console.error("Error fetching suggestions: ", error);
-                suggestionsList.innerHTML = `<p class="text-center text-red-500">Error loading suggestions: ${error.message}</p>`;
-            });
-        }
-
-        // --- Form Submission (Add/Edit Sweet) ---
-        sweetForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('sweet-id').value;
-            const sweetData = {
-                name: document.getElementById('name').value,
-                price: parseFloat(document.getElementById('price').value),
-                description: document.getElementById('description').value,
-                unit: document.getElementById('unit').value,
-                image: document.getElementById('image').value,
-                inStock: document.getElementById('inStock').checked,
-                bestSeller: document.getElementById('bestSeller').checked,
-                id: id ? parseInt(id) : Date.now() 
-            };
-
-            try {
-                if (id) {
-                    const sweetDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, id);
-                    await updateDoc(sweetDocRef, sweetData);
-                } else {
-                    const newDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, sweetData.id.toString());
-                    await setDoc(newDocRef, sweetData);
-                }
-                closeModal();
-            } catch (error) {
-                console.error("Error saving sweet:", error);
-                alert(`Could not save sweet: ${error.message}`);
-            }
-        });
-
-        // --- Event Listeners for Table Actions ---
-        sweetsTableBody.addEventListener('click', async (e) => {
-            const target = e.target.closest('button');
-            if (!target) return;
-
-            const id = target.dataset.id;
-            const sweetDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, id);
-            
-            if (target.classList.contains('edit-btn')) {
                 try {
-                    const docSnap = await getDoc(sweetDocRef);
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        document.getElementById('sweet-id').value = docSnap.id;
-                        document.getElementById('name').value = data.name;
-                        document.getElementById('price').value = data.price;
-                        document.getElementById('description').value = data.description;
-                        document.getElementById('unit').value = data.unit;
-                        document.getElementById('image').value = data.image;
-                        document.getElementById('inStock').checked = data.inStock;
-                        document.getElementById('bestSeller').checked = data.bestSeller;
-                        modalTitle.textContent = `Edit ${data.name}`;
-                        openModal();
+                    if (!auth.currentUser) {
+                        await signInAnonymously(auth);
                     }
                 } catch (error) {
-                    console.error("Error fetching sweet for edit:", error);
+                     console.error("Authentication failed:", error);
+                     let errorMessage = `<div class="text-red-500 text-center p-8">Error: Authentication failed. ${error.message}</div>`;
+                     if (error.code === 'auth/configuration-not-found') {
+                         errorMessage = `
+                            <div class="text-red-500 text-center p-8">
+                                <h2 class="font-bold text-lg mb-2">Error: Authentication Not Enabled</h2>
+                                <p class="mb-4">This usually means you need to enable an authentication method in your Firebase project.</p>
+                                <div class="text-left max-w-md mx-auto bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <h3 class="font-bold mb-2">How to Fix:</h3>
+                                    <ol class="list-decimal list-inside space-y-1">
+                                        <li>Go to the <a href="https://console.firebase.google.com/" target="_blank" class="underline">Firebase Console</a> and select your project ('meethe-275ef').</li>
+                                        <li>In the left menu, go to <strong>Build > Authentication</strong>.</li>
+                                        <li>Click the <strong>"Get started"</strong> button if it appears.</li>
+                                        <li>Go to the <strong>"Sign-in method"</strong> tab.</li>
+                                        <li>Find <strong>"Anonymous"</strong> in the list and click the pencil icon to edit.</li>
+                                        <li><strong>Enable</strong> the toggle switch and click <strong>Save</strong>.</li>
+                                        <li>Reload this page.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                         `;
+                     }
+                     appContainer.innerHTML = errorMessage;
                 }
-            }
 
-            if (target.classList.contains('delete-btn')) {
-                try {
-                    await deleteDoc(sweetDocRef);
-                } catch (error) {
-                    console.error("Error deleting sweet:", error);
+                // --- Load and Display Orders ---
+                function loadOrders() {
+                    onSnapshot(ordersCollection, (snapshot) => {
+                        ordersTableBody.innerHTML = '';
+                        if (snapshot.empty) {
+                            ordersTableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No current orders.</td></tr>';
+                            return;
+                        }
+                        const sortedDocs = snapshot.docs.sort((a, b) => {
+                            const timeA = a.data().createdAt?.seconds || 0;
+                            const timeB = b.data().createdAt?.seconds || 0;
+                            return timeB - timeA;
+                        });
+
+                        sortedDocs.forEach(doc => {
+                            const order = doc.data();
+                            if (order.status === 'completed') return;
+
+                            const tr = document.createElement('tr');
+                            tr.className = 'border-b hover:bg-gray-50';
+                            
+                            const itemsHtml = order.items.map(item => `<div>${item.name} (${item.displayQuantity})</div>`).join('');
+                            const orderTime = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleTimeString() : 'N/A';
+                            const customerInfoHtml = `
+                                <div>${order.customer.name}</div>
+                                <div class="text-xs text-gray-500">${order.customer.phone}</div>
+                                <div class="text-xs text-gray-500">${order.customer.room}</div>
+                            `;
+
+                            tr.innerHTML = `
+                                <td class="p-3">${orderTime}</td>
+                                <td class="p-3 text-sm">${customerInfoHtml}</td>
+                                <td class="p-3 text-sm">${itemsHtml}</td>
+                                <td class="p-3 font-bold">₹${order.subtotal.toFixed(2)}</td>
+                                <td class="p-3"><span class="bg-yellow-200 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Pending</span></td>
+                                <td class="p-3">
+                                    <button class="complete-order-btn bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600" data-id="${doc.id}">Complete</button>
+                                </td>
+                            `;
+                            ordersTableBody.appendChild(tr);
+                        });
+                    }, (error) => {
+                        console.error("Error fetching orders: ", error);
+                        ordersTableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Error loading orders: ${error.message}</td></tr>`;
+                    });
                 }
-            }
-        });
-        
-        ordersTableBody.addEventListener('click', async (e) => {
-            const target = e.target.closest('button.complete-order-btn');
-            if (!target) return;
-            
-            const id = target.dataset.id;
-            const orderDocRef = doc(db, `/artifacts/${appId}/public/data/orders`, id);
-            try {
-                await updateDoc(orderDocRef, { status: 'completed' });
-            } catch (error) {
-                console.error("Error completing order:", error);
-            }
-        });
 
-        // --- Gemini API Logic ---
-        const apiKey = ""; // API key will be injected by the environment.
+                // --- Load and Display Sweets ---
+                function loadSweets() {
+                    onSnapshot(sweetsCollection, (snapshot) => {
+                        sweetsTableBody.innerHTML = '';
+                        if (snapshot.empty) {
+                            sweetsTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No sweets found. Add one to get started!</td></tr>';
+                            return;
+                        }
+                        snapshot.forEach(doc => {
+                            const sweet = doc.data();
+                            const tr = document.createElement('tr');
+                            tr.className = 'border-b hover:bg-gray-50';
+                            tr.innerHTML = `
+                                <td class="p-3">${sweet.name}</td>
+                                <td class="p-3">₹${sweet.price}</td>
+                                <td class="p-3">${sweet.unit}</td>
+                                <td class="p-3">
+                                    <span class="inline-block w-4 h-4 rounded-full ${sweet.inStock ? 'bg-green-500' : 'bg-red-500'}"></span>
+                                </td>
+                                <td class="p-3 space-x-2">
+                                    <button class="edit-btn text-blue-600 hover:text-blue-800" data-id="${doc.id}"><i class="fas fa-edit"></i></button>
+                                    <button class="delete-btn text-red-600 hover:text-red-800" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
+                                </td>
+                            `;
+                            sweetsTableBody.appendChild(tr);
+                        });
+                    }, (error) => {
+                        console.error("Error fetching sweets: ", error);
+                        sweetsTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error loading sweets: ${error.message}</td></tr>`;
+                    });
+                }
 
-        async function callGeminiForText(prompt) {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                // --- Load and Display Suggestions ---
+                function loadSuggestions() {
+                    onSnapshot(suggestionsCollection, (snapshot) => {
+                        suggestionsList.innerHTML = '';
+                        if (snapshot.empty) {
+                            suggestionsList.innerHTML = '<p class="text-center text-gray-500">No suggestions yet.</p>';
+                            return;
+                        }
+                        snapshot.forEach(doc => {
+                            const suggestion = doc.data();
+                            const div = document.createElement('div');
+                            div.className = 'bg-gray-100 p-3 rounded-md';
+                            div.textContent = suggestion.text;
+                            suggestionsList.appendChild(div);
+                        });
+                    }, (error) => {
+                        console.error("Error fetching suggestions: ", error);
+                        suggestionsList.innerHTML = `<p class="text-center text-red-500">Error loading suggestions: ${error.message}</p>`;
+                    });
+                }
+
+                // --- Form Submission (Add/Edit Sweet) ---
+                sweetForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const id = document.getElementById('sweet-id').value;
+                    const sweetData = {
+                        name: document.getElementById('name').value,
+                        price: parseFloat(document.getElementById('price').value),
+                        description: document.getElementById('description').value,
+                        unit: document.getElementById('unit').value,
+                        image: document.getElementById('image').value,
+                        inStock: document.getElementById('inStock').checked,
+                        bestSeller: document.getElementById('bestSeller').checked,
+                        id: id ? parseInt(id) : Date.now() 
+                    };
+
+                    try {
+                        if (id) {
+                            const sweetDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, id);
+                            await updateDoc(sweetDocRef, sweetData);
+                        } else {
+                            const newDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, sweetData.id.toString());
+                            await setDoc(newDocRef, sweetData);
+                        }
+                        closeModal();
+                    } catch (error) {
+                        console.error("Error saving sweet:", error);
+                        alert(`Could not save sweet: ${error.message}`);
+                    }
                 });
-                if (!response.ok) {
-                    throw new Error(`API call failed with status: ${response.status}`);
+
+                // --- Event Listeners for Table Actions ---
+                sweetsTableBody.addEventListener('click', async (e) => {
+                    const target = e.target.closest('button');
+                    if (!target) return;
+
+                    const id = target.dataset.id;
+                    const sweetDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, id);
+                    
+                    if (target.classList.contains('edit-btn')) {
+                        try {
+                            const docSnap = await getDoc(sweetDocRef);
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                document.getElementById('sweet-id').value = docSnap.id;
+                                document.getElementById('name').value = data.name;
+                                document.getElementById('price').value = data.price;
+                                document.getElementById('description').value = data.description;
+                                document.getElementById('unit').value = data.unit;
+                                document.getElementById('image').value = data.image;
+                                document.getElementById('inStock').checked = data.inStock;
+                                document.getElementById('bestSeller').checked = data.bestSeller;
+                                modalTitle.textContent = `Edit ${data.name}`;
+                                openModal();
+                            }
+                        } catch (error) {
+                            console.error("Error fetching sweet for edit:", error);
+                        }
+                    }
+
+                    if (target.classList.contains('delete-btn')) {
+                        try {
+                            await deleteDoc(sweetDocRef);
+                        } catch (error) {
+                            console.error("Error deleting sweet:", error);
+                        }
+                    }
+                });
+                
+                ordersTableBody.addEventListener('click', async (e) => {
+                    const target = e.target.closest('button.complete-order-btn');
+                    if (!target) return;
+                    
+                    const id = target.dataset.id;
+                    const orderDocRef = doc(db, `/artifacts/${appId}/public/data/orders`, id);
+                    try {
+                        await updateDoc(orderDocRef, { status: 'completed' });
+                    } catch (error) {
+                        console.error("Error completing order:", error);
+                    }
+                });
+
+                // --- Gemini API Logic ---
+                const apiKey = ""; // API key will be injected by the environment.
+
+                async function callGeminiForText(prompt) {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                    
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) {
+                            throw new Error(`API call failed with status: ${response.status}`);
+                        }
+                        const result = await response.json();
+                        if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                            return result.candidates[0].content.parts[0].text;
+                        }
+                    } catch (error) {
+                        console.error("Gemini API call error:", error);
+                        return null;
+                    }
+                    return null;
                 }
-                const result = await response.json();
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
-                    return result.candidates[0].content.parts[0].text;
-                }
-            } catch (error) {
-                console.error("Gemini API call error:", error);
-                return null;
-            }
-            return null;
-        }
 
-        generateDescBtn.addEventListener('click', async () => {
-            const sweetName = document.getElementById('name').value;
-            if (!sweetName) {
-                alert("Please enter a sweet name first.");
-                return;
-            }
+                generateDescBtn.addEventListener('click', async () => {
+                    const sweetName = document.getElementById('name').value;
+                    if (!sweetName) {
+                        alert("Please enter a sweet name first.");
+                        return;
+                    }
 
-            const originalButtonText = generateDescBtn.innerHTML;
-            generateDescBtn.innerHTML = '<span class="loader"></span>';
-            generateDescBtn.disabled = true;
+                    const originalButtonText = generateDescBtn.innerHTML;
+                    generateDescBtn.innerHTML = '<span class="loader"></span>';
+                    generateDescBtn.disabled = true;
 
-            const prompt = `Create a short, delicious, and marketable menu description for an Indian sweet called "${sweetName}". The description should be one or two sentences long.`;
-            
-            const generatedDesc = await callGeminiForText(prompt);
+                    const prompt = `Create a short, delicious, and marketable menu description for an Indian sweet called "${sweetName}". The description should be one or two sentences long.`;
+                    
+                    const generatedDesc = await callGeminiForText(prompt);
 
-            if (generatedDesc) {
-                document.getElementById('description').value = generatedDesc.trim();
-            } else {
-                alert("Sorry, we couldn't generate a description. Please try again.");
+                    if (generatedDesc) {
+                        document.getElementById('description').value = generatedDesc.trim();
+                    } else {
+                        alert("Sorry, we couldn't generate a description. Please try again.");
+                    }
+
+                    generateDescBtn.innerHTML = originalButtonText;
+                    generateDescBtn.disabled = false;
+                });
             }
 
-            generateDescBtn.innerHTML = originalButtonText;
-            generateDescBtn.disabled = false;
+            // --- Run the main function to start the app ---
+            main();
         });
-
-        // --- Run the main function to start the app ---
-        main();
-
     </script>
 </body>
 </html>
