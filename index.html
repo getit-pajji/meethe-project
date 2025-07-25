@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meethe - Funky Indian Sweets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFF8F0; /* Creamy background */
+        }
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+        /* Custom colors for tailwind */
+        .bg-brand-pink { background-color: #FF6B6B; }
+        .text-brand-pink { color: #FF6B6B; }
+        .hover\:bg-brand-pink-dark:hover { background-color: #e65454; }
+        
+        .bg-brand-orange { background-color: #FFA500; }
+        .text-brand-orange { color: #FFA500; }
+        
+        .bg-brand-teal { background-color: #48BB78; }
+        .text-brand-teal { color: #48BB78; }
+        
+        .bg-brand-yellow { background-color: #FFD700; }
+        .text-brand-yellow { color: #FFD700; }
+
+        .doodle-bg {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFDAB9' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        /* Tic-Tac-Toe Game Styling - Fixed container */
+        .game-container {
+            min-height: 450px; /* Fixed height for the container */
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        .cell {
+            background-color: #fff;
+            border: 2px solid #FFDAB9; /* Peach color */
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cell:hover {
+            background-color: #FFF0E1;
+        }
+        .cell.x { color: #FF6B6B; } /* Brand Pink */
+        .cell.o { color: #48BB78; } /* Brand Teal */
+
+        /* Disabled button style */
+        .disabled-button {
+            background-color: #D1D5DB;
+            cursor: not-allowed;
+        }
+
+        /* Shopping Cart Styles */
+        #cart-sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-sidebar.translate-x-full {
+            transform: translateX(100%);
+        }
+        .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .quantity-input {
+            -moz-appearance: textfield;
+        }
+        
+        /* Spinner for loading state */
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #FF6B6B;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Unit Toggle Active State */
+        .unit-toggle.active {
+            background-color: #FF6B6B;
+            color: white;
+        }
+        
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 shadow-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-4xl font-pacifico text-brand-pink">Meethe</h1>
+            <nav class="hidden md:flex space-x-8 font-semibold">
+                <a href="#home" class="text-gray-600 hover:text-brand-pink transition duration-300">Home</a>
+                <a href="#catalog" class="text-gray-600 hover:text-brand-pink transition duration-300">Catalog</a>
+                <a href="#suggestions" class="text-gray-600 hover:text-brand-pink transition duration-300">Suggestions</a>
+                <a href="#game" class="text-gray-600 hover:text-brand-pink transition duration-300">Play a Game</a>
+                <a href="#contact" class="text-gray-600 hover:text-brand-pink transition duration-300">Contact</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-brand-pink">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white">
+            <a href="#home" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Home</a>
+            <a href="#catalog" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Catalog</a>
+            <a href="#suggestions" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Suggestions</a>
+            <a href="#game" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Play a Game</a>
+            <a href="#contact" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Landing Page Section -->
+        <section id="home" class="min-h-screen flex items-center doodle-bg">
+            <div class="container mx-auto px-6 py-12 text-center">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-5xl md:text-7xl font-bold text-gray-800 leading-tight">
+                        A Bite of <span class="font-pacifico text-brand-pink">Sweet</span> Tradition.
+                    </h2>
+                    <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+                        Freshly made Ghewar, Jalebi, and more, delivered with love. Your daily dose of desi sweetness is just a click away!
+                    </p>
+                    <div class="mt-10">
+                        <a href="#catalog" class="bg-brand-pink text-white font-bold px-10 py-4 rounded-full shadow-lg hover:bg-brand-pink-dark transition duration-300 transform hover:scale-105 text-lg">
+                            View Full Menu
+                        </a>
+                    </div>
+                </div>
+                 <div class="mt-16">
+                    <img src="https://placehold.co/800x400/FF6B6B/FFFFFF?text=Yummy+Sweets+Doodle" alt="Doodle of Indian sweets" class="mx-auto rounded-lg shadow-2xl" style="border: 5px solid white;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Catalog Section -->
+        <section id="catalog" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Our <span class="font-pacifico text-brand-pink">Sweet</span> Catalog</h2>
+                    <p class="mt-4 text-lg text-gray-600">Handcrafted with love, just for you. Updated daily!</p>
+                </div>
+                <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+                    <!-- Product cards will be dynamically inserted here by JavaScript -->
+                     <p class="col-span-full text-center text-gray-500">Loading our delicious sweets...</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Suggestions Section -->
+        <section id="suggestions" class="py-20 bg-brand-teal/10">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Have a <span class="font-pacifico text-brand-teal">Sweet</span> Idea?</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Craving something special? Let us know what sweets you'd love to see on our menu!</p>
+                <div class="mt-10 max-w-xl mx-auto">
+                    <form id="suggestion-form" class="bg-white p-8 rounded-2xl shadow-lg">
+                        <textarea id="suggestion-text" class="w-full p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-transparent transition" rows="4" placeholder="e.g., 'I would love to see Chocolate Barfi!'"></textarea>
+                        <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                             <button type="button" id="enhance-suggestion-button" class="w-full sm:w-1/2 bg-brand-orange text-white font-bold px-8 py-3 rounded-full shadow-lg hover:bg-opacity-90 transition duration-300 text-lg">✨ Enhance My Idea!</button>
+                             <button type="submit" class="w-full sm:w-1/2 bg-brand-teal text-white font-bold px-8 py-3 rounded-full shadow-lg hover:bg-opacity-90 transition duration-300 text-lg">Submit Suggestion</button>
+                        </div>
+                    </form>
+                    <div id="suggestion-thanks" class="hidden mt-6 p-4 bg-green-100 text-green-800 rounded-lg">
+                        <p>Thank you! We've received your sweet suggestion. 🎉</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 2-Player Game & Tournaments Section -->
+        <section id="game" class="py-20 doodle-bg">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Fun Zone</h2>
+                <p class="mt-4 text-lg text-gray-600 mb-8">Play a game or check out our e-sports tournaments!</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                    <!-- Tic Tac Toe Game -->
+                    <div id="game-container" class="game-container max-w-md mx-auto bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-800">Tic-Tac-Toe</h3>
+                        <div id="status" class="text-xl font-semibold mb-2 h-8 text-brand-pink">Player X's turn</div>
+                        <div id="game-board" class="game-board">
+                            <!-- Cells will be generated by JS -->
+                        </div>
+                        <button id="reset-button" class="mt-4 bg-brand-pink text-white font-bold px-8 py-3 rounded-full shadow-lg hover:bg-brand-pink-dark transition duration-300">Reset Game</button>
+                    </div>
+
+                    <!-- E-Sports Tournament Plugin -->
+                    <div id="esports-plugin" class="max-w-md mx-auto bg-gray-800 text-white p-6 rounded-2xl shadow-lg border-4 border-brand-yellow">
+                        <div class="flex items-center justify-center mb-4">
+                             <i class="fas fa-gamepad text-brand-yellow text-3xl mr-3"></i>
+                             <h3 class="text-2xl font-bold">E-Sports Tournaments</h3>
+                        </div>
+                        <p class="text-gray-300 mb-6">Join our exciting online tournaments and win sweet prizes!</p>
+                        
+                        <div class="space-y-4">
+                            <!-- Tournament Item 1 -->
+                            <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-lg">Valorant Weekly Clash</h4>
+                                    <p class="text-sm text-gray-400">Every Saturday @ 6 PM</p>
+                                </div>
+                                <a href="#" class="bg-brand-yellow text-gray-900 font-bold px-4 py-2 rounded-md hover:bg-yellow-300 transition">Register</a>
+                            </div>
+                            <!-- Tournament Item 2 -->
+                             <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-lg">BGMI Champions Cup</h4>
+                                    <p class="text-sm text-gray-400">July 28th, 2025</p>
+                                </div>
+                                <a href="#" class="bg-gray-500 text-white font-bold px-4 py-2 rounded-md cursor-not-allowed">Closed</a>
+                            </div>
+                            <!-- Tournament Item 3 -->
+                             <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-lg">FIFA 25 Kick-Off</h4>
+                                    <p class="text-sm text-gray-400">Coming Soon!</p>
+                                </div>
+                                <a href="#" class="bg-brand-yellow text-gray-900 font-bold px-4 py-2 rounded-md hover:bg-yellow-300 transition">Notify Me</a>
+                            </div>
+                        </div>
+                        <a href="#" class="mt-6 inline-block text-brand-yellow hover:underline">View all tournaments &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Say <span class="font-pacifico text-brand-pink">Hello!</span></h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">For party orders, questions, or just to share your love for sweets!</p>
+                <div class="mt-10 max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border-t-8 border-brand-yellow">
+                    <p class="text-gray-700">Drop us a message on WhatsApp:</p>
+                    <a href="#" class="mt-4 inline-block text-2xl font-bold text-green-500 hover:text-green-600 transition">
+                        <i class="fab fa-whatsapp mr-2"></i> +91 12345 67890
+                    </a>
+                    <p class="mt-6 text-gray-700">Or email us at:</p>
+                    <a href="mailto:love@meethe.com" class="mt-1 inline-block text-lg font-semibold text-brand-pink hover:underline">
+                        love@meethe.com
+                    </a>
+                    <div class="mt-8 flex justify-center space-x-6">
+                        <a href="#" class="text-gray-400 hover:text-brand-pink"><i class="fab fa-instagram text-3xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-brand-orange"><i class="fab fa-twitter text-3xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-brand-teal"><i class="fab fa-facebook text-3xl"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 Meethe. All Rights Reserved. Made with <i class="fas fa-heart text-brand-pink"></i> and lots of sugar.</p>
+        </div>
+    </footer>
+
+    <!-- Floating Cart Button -->
+    <button id="cart-button" class="fixed bottom-6 right-6 bg-brand-pink text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center z-50 transform hover:scale-110 transition-transform">
+        <i class="fas fa-shopping-cart text-2xl"></i>
+        <span id="cart-item-count" class="absolute -top-1 -right-1 bg-brand-yellow text-gray-900 text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">0</span>
+    </button>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full">
+        <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">Your Sweet Cart</h2>
+                <button id="close-cart-button" class="text-gray-500 hover:text-gray-800">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
+                <!-- Cart items will be dynamically inserted here -->
+                <p id="empty-cart-message" class="text-gray-500">Your cart is empty. Add some sweets!</p>
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                <div id="ai-combo-suggester" class="hidden mb-4 p-4 bg-indigo-100 rounded-lg">
+                    <h4 class="font-bold text-indigo-800">Your Combo: <span id="combo-name"></span></h4>
+                    <p class="text-sm text-indigo-700" id="combo-description"></p>
+                </div>
+                <button id="suggest-combo-button" class="w-full mb-4 bg-brand-orange text-white font-bold py-2 rounded-lg hover:bg-opacity-90 transition-all duration-300 hidden">✨ Suggest a Combo!</button>
+
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium text-gray-600">Subtotal</span>
+                    <span id="cart-subtotal" class="text-2xl font-bold text-gray-900">₹0.00</span>
+                </div>
+                <button id="checkout-button" class="w-full bg-brand-teal text-white font-bold py-3 rounded-lg hover:bg-opacity-90 transition-all duration-300">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+    <!-- Customer Info Modal -->
+    <div id="customer-info-modal" class="modal fixed inset-0 bg-black bg-opacity-60 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md m-4">
+            <h2 class="text-2xl font-bold mb-6">Your Delivery Details</h2>
+            <form id="customer-info-form">
+                <div class="space-y-4">
+                    <div>
+                        <label for="customer-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="customer-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-pink">
+                    </div>
+                    <div>
+                        <label for="customer-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="tel" id="customer-phone" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-pink">
+                    </div>
+                    <div>
+                        <label for="customer-room" class="block text-sm font-medium text-gray-700">Hostel & Room No.</label>
+                        <input type="text" id="customer-room" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-pink">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-8">
+                    <button type="button" id="cancel-order-btn" class="bg-gray-200 text-gray-800 font-bold px-4 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="bg-brand-teal text-white font-bold px-6 py-2 rounded-lg hover:bg-opacity-90">Place Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "your-fallback-key", authDomain: "your-fallback-domain", projectId: "your-fallback-project-id" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let sweetsData = []; // This will be populated from Firestore
+        let cart = [];
+
+        // --- Main Authentication and Data Loading Function ---
+        async function main() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                console.log("User authenticated with UID:", auth.currentUser.uid);
+                loadSweetsFromFirestore();
+
+            } catch (error) {
+                console.error("Authentication or data loading failed:", error);
+                const catalogGrid = document.getElementById('catalog-grid');
+                if(catalogGrid) {
+                    catalogGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error: Could not connect to the database. ${error.message}</p>`;
+                }
+            }
+        }
+
+        // --- Load Sweets from Firestore ---
+        function loadSweetsFromFirestore() {
+            const sweetsCollection = collection(db, `/artifacts/${appId}/public/data/sweets`);
+            onSnapshot(sweetsCollection, (snapshot) => {
+                sweetsData = [];
+                snapshot.forEach(doc => {
+                    sweetsData.push({ ...doc.data(), firestoreId: doc.id });
+                });
+                renderCatalog();
+            }, (error) => {
+                console.error("Error fetching sweets:", error);
+                const catalogGrid = document.getElementById('catalog-grid');
+                if(catalogGrid) {
+                    catalogGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error loading sweets: ${error.message}</p>`;
+                }
+            });
+        }
+
+        // --- Product Catalog Rendering ---
+        const catalogGrid = document.getElementById('catalog-grid');
+        
+        function renderCatalog() {
+            if (!catalogGrid) return;
+            catalogGrid.innerHTML = '';
+            if (sweetsData.length === 0) {
+                 catalogGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">No sweets available right now. Please check back later!</p>';
+                 return;
+            }
+            
+            sweetsData.forEach(sweet => {
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-xl shadow-lg p-6 text-center flex flex-col justify-between transform hover:-translate-y-2 transition duration-300 border-b-8 border-brand-pink`; // Color can be dynamic later
+                
+                const availabilityBadge = sweet.inStock
+                    ? `<span class="absolute top-0 left-0 mt-3 ml-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">In Stock</span>`
+                    : `<span class="absolute top-0 left-0 mt-3 ml-3 bg-gray-400 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>`;
+                
+                const bestSellerBadge = sweet.bestSeller
+                    ? `<span class="absolute top-0 right-0 mt-3 mr-3 bg-brand-yellow text-gray-900 text-xs font-bold px-3 py-1 rounded-full animate-pulse">Best Seller</span>`
+                    : '';
+
+                const priceDisplay = `₹${sweet.price} / ${sweet.unit}`;
+
+                let actionArea = '';
+                if (sweet.inStock) {
+                    if (sweet.unit === 'piece') {
+                        actionArea = `
+                            <div class="flex items-center justify-center space-x-3">
+                                <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="-1">-</button>
+                                <input type="number" value="1" min="1" class="quantity-input w-16 h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
+                                <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="1">+</button>
+                            </div>
+                            <button class="add-to-cart-piece w-full mt-3 bg-brand-pink text-white font-semibold py-3 rounded-lg hover:bg-opacity-90 transition" data-id="${sweet.id}">Add to Cart</button>
+                        `;
+                    } else if (sweet.unit === 'kg') {
+                        actionArea = `
+                            <div class="flex items-center justify-center space-x-1 bg-gray-100 rounded-full p-1 my-2">
+                                <button class="unit-toggle w-full rounded-full px-4 py-1 text-sm font-bold" data-id="${sweet.id}" data-unit="g">g</button>
+                                <button class="unit-toggle active w-full rounded-full px-4 py-1 text-sm font-bold" data-id="${sweet.id}" data-unit="kg">kg</button>
+                            </div>
+                            <div class="flex items-center justify-center space-x-2">
+                                <input type="number" value="0.25" step="0.25" min="0.25" class="quantity-input w-full h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
+                            </div>
+                            <button class="add-to-cart-weight w-full mt-3 bg-brand-pink text-white font-semibold py-3 rounded-lg hover:bg-opacity-90 transition" data-id="${sweet.id}">Add to Cart</button>
+                        `;
+                    }
+                } else {
+                    actionArea = `<button class="w-full disabled-button text-white font-semibold py-3 rounded-lg" disabled>Out of Stock</button>`;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="relative">
+                            <img src="${sweet.image}" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/ffffff?text=Image+Not+Found';" class="mx-auto rounded-lg mb-4" alt="${sweet.name}">
+                            ${availabilityBadge}
+                            ${bestSellerBadge}
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">${sweet.name}</h3>
+                        <p class="mt-2 text-gray-500 h-16">${sweet.description}</p>
+                        <div class="my-4 text-3xl font-bold text-brand-teal">${priceDisplay}</div>
+                    </div>
+                    <div class="mt-auto">
+                        ${actionArea}
+                    </div>
+                `;
+                catalogGrid.appendChild(card);
+            });
+        }
+        
+        // --- Cart Logic ---
+        const cartButton = document.getElementById('cart-button');
+        const cartSidebar = document.getElementById('cart-sidebar');
+        const closeCartButton = document.getElementById('close-cart-button');
+        const cartOverlay = document.getElementById('cart-overlay');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartItemCount = document.getElementById('cart-item-count');
+        const cartSubtotal = document.getElementById('cart-subtotal');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const suggestComboButton = document.getElementById('suggest-combo-button');
+        const aiComboSuggester = document.getElementById('ai-combo-suggester');
+        const comboNameEl = document.getElementById('combo-name');
+        const comboDescriptionEl = document.getElementById('combo-description');
+        const checkoutButton = document.getElementById('checkout-button');
+
+        function toggleCart() {
+            cartSidebar.classList.toggle('translate-x-full');
+            cartOverlay.classList.toggle('hidden');
+        }
+
+        cartButton.addEventListener('click', toggleCart);
+        closeCartButton.addEventListener('click', toggleCart);
+        cartOverlay.addEventListener('click', toggleCart);
+
+        function addToCart(id, quantity, unit) {
+            const sweet = sweetsData.find(s => s.id === id);
+            if (!sweet) return;
+
+            const existingItem = cart.find(item => item.id === id);
+
+            if (existingItem) {
+                if (sweet.unit === 'piece') {
+                    existingItem.quantity += quantity;
+                } else if (sweet.unit === 'kg') {
+                    const quantityInGrams = unit === 'kg' ? quantity * 1000 : quantity;
+                    existingItem.quantity += quantityInGrams;
+                }
+            } else {
+                if (sweet.unit === 'piece') {
+                    cart.push({ ...sweet, quantity: quantity });
+                } else if (sweet.unit === 'kg') {
+                    const quantityInGrams = unit === 'kg' ? quantity * 1000 : quantity;
+                    cart.push({ ...sweet, quantity: quantityInGrams });
+                }
+            }
+            updateCart();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        }
+
+        function updateCart() {
+            cartItemsContainer.innerHTML = '';
+            let subtotal = 0;
+
+            if (cart.length === 0) {
+                emptyCartMessage.style.display = 'block';
+                suggestComboButton.classList.add('hidden');
+                aiComboSuggester.classList.add('hidden');
+                checkoutButton.classList.add('disabled-button');
+                checkoutButton.disabled = true;
+            } else {
+                emptyCartMessage.style.display = 'none';
+                suggestComboButton.classList.remove('hidden');
+                checkoutButton.classList.remove('disabled-button');
+                checkoutButton.disabled = false;
+                cart.forEach(item => {
+                    let itemTotal = 0;
+                    let displayQuantity = '';
+
+                    if (item.unit === 'piece') {
+                        itemTotal = item.price * item.quantity;
+                        displayQuantity = `${item.quantity} pc`;
+                    } else if (item.unit === 'kg') {
+                        itemTotal = (item.price / 1000) * item.quantity;
+                        displayQuantity = item.quantity >= 1000 ? `${(item.quantity / 1000).toFixed(2)} kg` : `${item.quantity} g`;
+                    }
+                    
+                    subtotal += itemTotal;
+
+                    const cartItemElement = document.createElement('div');
+                    cartItemElement.className = 'flex items-center justify-between py-4 border-b';
+                    cartItemElement.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${item.image}" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/ffffff?text=Img';" alt="${item.name}" class="w-16 h-16 rounded-md object-cover mr-4">
+                            <div>
+                                <h4 class="font-bold">${item.name}</h4>
+                                <p class="text-sm text-gray-500">Qty: ${displayQuantity}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="font-bold mr-4">₹${itemTotal.toFixed(2)}</span>
+                            <button class="remove-from-cart text-red-500 hover:text-red-700" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    cartItemsContainer.appendChild(cartItemElement);
+                });
+            }
+            
+            cartSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
+            cartItemCount.textContent = cart.length;
+            cartItemCount.classList.toggle('hidden', cart.length === 0);
+        }
+
+        catalogGrid.addEventListener('click', e => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const id = parseInt(target.dataset.id);
+
+            if (target.classList.contains('unit-toggle')) {
+                const unit = target.dataset.unit;
+                const parent = target.closest('.mt-auto');
+                parent.querySelectorAll('.unit-toggle').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
+                
+                const input = parent.querySelector('.quantity-input');
+                if (unit === 'kg') {
+                    input.step = 0.25;
+                    input.min = 0.25;
+                    input.value = 0.25;
+                } else { // grams
+                    input.step = 50;
+                    input.min = 50;
+                    input.value = 100;
+                }
+            }
+
+            if (target.classList.contains('add-to-cart-weight')) {
+                 const parent = target.closest('.mt-auto');
+                 const activeUnit = parent.querySelector('.unit-toggle.active').dataset.unit;
+                 const quantity = parseFloat(parent.querySelector('.quantity-input').value);
+                 addToCart(id, quantity, activeUnit);
+            }
+
+            if (target.classList.contains('add-to-cart-piece')) {
+                const input = target.previousElementSibling.querySelector('input');
+                const quantity = parseInt(input.value);
+                addToCart(id, quantity, 'piece');
+            }
+
+            if (target.classList.contains('quantity-change')) {
+                const change = parseInt(target.dataset.change);
+                const input = target.parentElement.querySelector('input');
+                let currentValue = parseInt(input.value);
+                currentValue = Math.max(1, currentValue + change);
+                input.value = currentValue;
+            }
+        });
+        
+        cartItemsContainer.addEventListener('click', e => {
+             const target = e.target.closest('button.remove-from-cart');
+             if(target) {
+                 const id = parseInt(target.dataset.id);
+                 removeFromCart(id);
+             }
+        });
+
+        // --- Customer Info Modal & Order Submission ---
+        const customerInfoModal = document.getElementById('customer-info-modal');
+        const customerInfoForm = document.getElementById('customer-info-form');
+        const cancelOrderBtn = document.getElementById('cancel-order-btn');
+
+        checkoutButton.addEventListener('click', () => {
+            if (cart.length > 0) {
+                customerInfoModal.classList.add('active');
+            }
+        });
+
+        cancelOrderBtn.addEventListener('click', () => {
+            customerInfoModal.classList.remove('active');
+        });
+
+        customerInfoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const orderData = {
+                customer: {
+                    name: document.getElementById('customer-name').value,
+                    phone: document.getElementById('customer-phone').value,
+                    room: document.getElementById('customer-room').value,
+                },
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    displayQuantity: item.unit === 'kg' ? (item.quantity >= 1000 ? `${(item.quantity / 1000).toFixed(2)} kg` : `${item.quantity} g`) : `${item.quantity} pc`
+                })),
+                subtotal: parseFloat(cartSubtotal.textContent.replace('₹', '')),
+                status: 'pending',
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                const ordersCollection = collection(db, `/artifacts/${appId}/public/data/orders`);
+                await addDoc(ordersCollection, orderData);
+                
+                alert('Thank you! Your order has been placed.');
+
+                // Reset state
+                cart = [];
+                updateCart();
+                customerInfoForm.reset();
+                customerInfoModal.classList.remove('active');
+                toggleCart();
+
+            } catch (error) {
+                console.error("Error placing order: ", error);
+                alert("Sorry, there was an issue placing your order. Please try again.");
+            }
+        });
+
+        // --- Gemini API Logic ---
+        const apiKey = ""; // API key will be injected by the environment.
+
+        async function callGemini(prompt) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                 generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "comboName": { "type": "STRING" },
+                            "description": { "type": "STRING" }
+                        },
+                    }
+                }
+            };
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    return JSON.parse(result.candidates[0].content.parts[0].text);
+                }
+            } catch (error) {
+                console.error("Gemini API call error:", error);
+                return null;
+            }
+            return null;
+        }
+        
+        async function callGeminiForText(prompt) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                 if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    return result.candidates[0].content.parts[0].text;
+                }
+            } catch (error) {
+                console.error("Gemini API call error:", error);
+                return null;
+            }
+            return null;
+        }
+
+        // AI Combo Suggester
+        suggestComboButton.addEventListener('click', async () => {
+            const originalText = suggestComboButton.innerHTML;
+            suggestComboButton.innerHTML = `<span class="loader"></span> Thinking...`;
+            suggestComboButton.disabled = true;
+
+            const itemNames = cart.map(item => {
+                const displayQuantity = item.unit === 'kg' 
+                    ? (item.quantity >= 1000 ? `${(item.quantity / 1000).toFixed(2)} kg` : `${item.quantity} g`)
+                    : `${item.quantity} piece(s)`;
+                return `${displayQuantity} of ${item.name}`;
+            }).join(', ');
+            const prompt = `I have a cart with these Indian sweets: ${itemNames}. Give me a fun, creative, and short combo name and a one-sentence, catchy description for this combination. Format the output as a JSON object with keys "comboName" and "description".`;
+            
+            const result = await callGemini(prompt);
+
+            if (result && result.comboName && result.description) {
+                comboNameEl.textContent = result.comboName;
+                comboDescriptionEl.textContent = result.description;
+                aiComboSuggester.classList.remove('hidden');
+            } else {
+                comboNameEl.textContent = "The Ultimate Treat Box";
+                comboDescriptionEl.textContent = "A delightful assortment of our finest sweets, perfect for any occasion!";
+                aiComboSuggester.classList.remove('hidden');
+            }
+
+            suggestComboButton.innerHTML = originalText;
+            suggestComboButton.disabled = false;
+        });
+
+        // AI Suggestion Enhancer & Form Submission
+        const enhanceSuggestionButton = document.getElementById('enhance-suggestion-button');
+        const suggestionText = document.getElementById('suggestion-text');
+        const suggestionForm = document.getElementById('suggestion-form');
+        const suggestionThanks = document.getElementById('suggestion-thanks');
+
+        enhanceSuggestionButton.addEventListener('click', async () => {
+            const userIdea = suggestionText.value.trim();
+            if (userIdea === '') {
+                suggestionText.placeholder = "Please enter an idea first!";
+                return;
+            }
+            const originalText = enhanceSuggestionButton.innerHTML;
+            enhanceSuggestionButton.innerHTML = `<span class="loader"></span> Enhancing...`;
+            enhanceSuggestionButton.disabled = true;
+            const prompt = `A customer suggested a new Indian sweet for our menu: "${userIdea}". Take this idea and write a short, enticing, and creative menu description for it. Make it sound delicious. Just provide the description, no extra text.`;
+            const enhancedText = await callGeminiForText(prompt);
+            if (enhancedText) {
+                suggestionText.value = enhancedText;
+            }
+            enhanceSuggestionButton.innerHTML = originalText;
+            enhanceSuggestionButton.disabled = false;
+        });
+
+        suggestionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = suggestionText.value.trim();
+            if (text !== '') {
+                try {
+                    const suggestionsCollection = collection(db, `/artifacts/${appId}/public/data/suggestions`);
+                    await addDoc(suggestionsCollection, { text: text, createdAt: serverTimestamp() });
+                    suggestionThanks.classList.remove('hidden');
+                    suggestionText.value = '';
+                    setTimeout(() => {
+                        suggestionThanks.classList.add('hidden');
+                    }, 5000);
+                } catch (error) {
+                    console.error("Error adding suggestion: ", error);
+                    alert("Sorry, we couldn't save your suggestion. Please try again.");
+                }
+            }
+        });
+
+
+        // --- Mobile menu toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // --- Tic-Tac-Toe Game Logic ---
+        const gameBoard = document.getElementById('game-board');
+        const statusDisplay = document.getElementById('status');
+        const resetButton = document.getElementById('reset-button');
+        
+        let currentPlayer = 'X';
+        let boardState = Array(9).fill(null);
+        let gameActive = true;
+        
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        function handleCellClick(e) {
+            const clickedCell = e.target;
+            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (boardState[clickedCellIndex] !== null || !gameActive) return;
+
+            boardState[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+            clickedCell.classList.add(currentPlayer.toLowerCase());
+
+            checkResult();
+        }
+
+        function checkResult() {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const winCondition = winningConditions[i];
+                let a = boardState[winCondition[0]];
+                let b = boardState[winCondition[1]];
+                let c = boardState[winCondition[2]];
+                if (a === null || b === null || c === null) continue;
+                if (a === b && b === c) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusDisplay.textContent = `Player ${currentPlayer} wins!`;
+                gameActive = false;
+                return;
+            }
+
+            if (!boardState.includes(null)) {
+                statusDisplay.textContent = 'Game is a draw!';
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+        }
+
+        function resetGame() {
+            boardState = Array(9).fill(null);
+            gameActive = true;
+            currentPlayer = 'X';
+            statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('x', 'o');
+            });
+        }
+
+        function createBoard() {
+            if (gameBoard && gameBoard.children.length === 0) {
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.setAttribute('data-index', i);
+                    cell.addEventListener('click', handleCellClick);
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+        
+        createBoard();
+        if(resetButton) resetButton.addEventListener('click', resetGame);
+
+        // --- Run the main function to start the app ---
+        main();
+    </script>
+</body>
+</html>
