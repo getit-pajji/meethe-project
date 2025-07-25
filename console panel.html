@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meethe - Admin Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        /* Spinner for loading state */
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4f46e5; /* indigo-600 */
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="app-container" class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800">Meethe Admin Console</h1>
+            <p class="text-gray-600">Manage your sweets, orders, and suggestions here.</p>
+        </header>
+
+        <!-- Current Orders Section -->
+        <section id="current-orders" class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-bold mb-4">Current Orders</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="p-3">Order Time</th>
+                            <th class="p-3">Items</th>
+                            <th class="p-3">Total</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        <!-- Orders will be loaded here -->
+                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sweets Management Section -->
+        <section id="sweets-management" class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Sweets Catalog</h2>
+                <button id="add-sweet-btn" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-plus mr-2"></i>Add New Sweet</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Price</th>
+                            <th class="p-3">Unit</th>
+                            <th class="p-3">In Stock</th>
+                            <th class="p-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sweets-table-body">
+                        <!-- Sweets will be loaded here -->
+                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading sweets...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Suggestions Section -->
+        <section id="suggestions-viewer" class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Customer Suggestions</h2>
+            <div id="suggestions-list" class="space-y-3 max-h-96 overflow-y-auto">
+                <!-- Suggestions will be loaded here -->
+                <p class="text-center text-gray-500">Loading suggestions...</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Add/Edit Sweet Modal -->
+    <div id="sweet-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg m-4">
+            <h2 id="modal-title" class="text-2xl font-bold mb-6">Add New Sweet</h2>
+            <form id="sweet-form">
+                <input type="hidden" id="sweet-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Sweet Name</label>
+                        <input type="text" id="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700">Price (in ₹)</label>
+                        <input type="number" id="price" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                 <div class="mb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <button type="button" id="generate-desc-btn" class="text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-1 rounded hover:bg-indigo-200">✨ Generate Description</button>
+                    </div>
+                    <textarea id="description" rows="3" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="unit" class="block text-sm font-medium text-gray-700">Unit</label>
+                        <select id="unit" required class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="kg">kg</option>
+                            <option value="piece">piece</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="image" class="block text-sm font-medium text-gray-700">Image URL</label>
+                        <input type="text" id="image" placeholder="https://placehold.co/..." required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="inStock" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="inStock" class="ml-2 block text-sm text-gray-900">In Stock</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="bestSeller" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="bestSeller" class="ml-2 block text-sm text-gray-900">Best Seller</label>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-btn" class="bg-gray-200 text-gray-800 font-bold px-4 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-blue-700">Save Sweet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "your-fallback-key", authDomain: "your-fallback-domain", projectId: "your-fallback-project-id" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // --- Collections ---
+        let sweetsCollection;
+        let suggestionsCollection;
+        let ordersCollection;
+
+        // --- DOM Elements ---
+        const sweetsTableBody = document.getElementById('sweets-table-body');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const ordersTableBody = document.getElementById('orders-table-body');
+        const modal = document.getElementById('sweet-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const sweetForm = document.getElementById('sweet-form');
+        const addSweetBtn = document.getElementById('add-sweet-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const generateDescBtn = document.getElementById('generate-desc-btn');
+
+        // --- Modal Management ---
+        const openModal = () => modal.classList.add('active');
+        const closeModal = () => {
+            modal.classList.remove('active');
+            sweetForm.reset();
+            document.getElementById('sweet-id').value = '';
+        };
+
+        addSweetBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Add New Sweet';
+            openModal();
+        });
+        cancelBtn.addEventListener('click', closeModal);
+
+        // --- Main Authentication and Data Loading Function ---
+        async function main() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                console.log("Admin authenticated with UID:", auth.currentUser.uid);
+
+                sweetsCollection = collection(db, `/artifacts/${appId}/public/data/sweets`);
+                suggestionsCollection = collection(db, `/artifacts/${appId}/public/data/suggestions`);
+                ordersCollection = collection(db, `/artifacts/${appId}/public/data/orders`);
+
+                loadSweets();
+                loadSuggestions();
+                loadOrders();
+
+            } catch (error) {
+                console.error("Authentication or data loading failed:", error);
+                sweetsTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error: Could not connect to the database. ${error.message}</td></tr>`;
+                suggestionsList.innerHTML = `<p class="text-center text-red-500">Could not load suggestions.</p>`;
+            }
+        }
+
+        // --- Load and Display Orders ---
+        function loadOrders() {
+            onSnapshot(ordersCollection, (snapshot) => {
+                ordersTableBody.innerHTML = '';
+                if (snapshot.empty) {
+                    ordersTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No current orders.</td></tr>';
+                    return;
+                }
+                snapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt).forEach(doc => {
+                    const order = doc.data();
+                    if (order.status === 'completed') return; // Don't show completed orders
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b hover:bg-gray-50';
+                    
+                    const itemsHtml = order.items.map(item => `<div>${item.name} (x${item.displayQuantity})</div>`).join('');
+                    const orderTime = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleTimeString() : 'N/A';
+
+                    tr.innerHTML = `
+                        <td class="p-3">${orderTime}</td>
+                        <td class="p-3 text-sm">${itemsHtml}</td>
+                        <td class="p-3 font-bold">₹${order.subtotal.toFixed(2)}</td>
+                        <td class="p-3"><span class="bg-yellow-200 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Pending</span></td>
+                        <td class="p-3">
+                            <button class="complete-order-btn bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600" data-id="${doc.id}">Complete</button>
+                        </td>
+                    `;
+                    ordersTableBody.appendChild(tr);
+                });
+            }, (error) => {
+                console.error("Error fetching orders: ", error);
+                ordersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error loading orders: ${error.message}</td></tr>`;
+            });
+        }
+
+        // --- Load and Display Sweets ---
+        function loadSweets() {
+            onSnapshot(sweetsCollection, (snapshot) => {
+                sweetsTableBody.innerHTML = '';
+                if (snapshot.empty) {
+                    sweetsTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No sweets found. Add one to get started!</td></tr>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const sweet = doc.data();
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b hover:bg-gray-50';
+                    tr.innerHTML = `
+                        <td class="p-3">${sweet.name}</td>
+                        <td class="p-3">₹${sweet.price}</td>
+                        <td class="p-3">${sweet.unit}</td>
+                        <td class="p-3">
+                            <span class="inline-block w-4 h-4 rounded-full ${sweet.inStock ? 'bg-green-500' : 'bg-red-500'}"></span>
+                        </td>
+                        <td class="p-3 space-x-2">
+                            <button class="edit-btn text-blue-600 hover:text-blue-800" data-id="${doc.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn text-red-600 hover:text-red-800" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    sweetsTableBody.appendChild(tr);
+                });
+            }, (error) => {
+                console.error("Error fetching sweets: ", error);
+                 sweetsTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error loading sweets: ${error.message}</td></tr>`;
+            });
+        }
+
+        // --- Load and Display Suggestions ---
+        function loadSuggestions() {
+            onSnapshot(suggestionsCollection, (snapshot) => {
+                suggestionsList.innerHTML = '';
+                 if (snapshot.empty) {
+                    suggestionsList.innerHTML = '<p class="text-center text-gray-500">No suggestions yet.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const suggestion = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'bg-gray-100 p-3 rounded-md';
+                    div.textContent = suggestion.text;
+                    suggestionsList.appendChild(div);
+                });
+            }, (error) => {
+                console.error("Error fetching suggestions: ", error);
+                suggestionsList.innerHTML = `<p class="text-center text-red-500">Error loading suggestions: ${error.message}</p>`;
+            });
+        }
+
+        // --- Form Submission (Add/Edit Sweet) ---
+        sweetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('sweet-id').value;
+            const sweetData = {
+                name: document.getElementById('name').value,
+                price: parseFloat(document.getElementById('price').value),
+                description: document.getElementById('description').value,
+                unit: document.getElementById('unit').value,
+                image: document.getElementById('image').value,
+                inStock: document.getElementById('inStock').checked,
+                bestSeller: document.getElementById('bestSeller').checked,
+                id: id ? parseInt(id) : Date.now() 
+            };
+
+            try {
+                if (id) {
+                    const sweetDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, id);
+                    await updateDoc(sweetDocRef, sweetData);
+                } else {
+                    const newDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, sweetData.id.toString());
+                    await setDoc(newDocRef, sweetData);
+                }
+                closeModal();
+            } catch (error) {
+                console.error("Error saving sweet:", error);
+                alert(`Could not save sweet: ${error.message}`);
+            }
+        });
+
+        // --- Event Listeners for Table Actions ---
+        sweetsTableBody.addEventListener('click', async (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const id = target.dataset.id;
+            const sweetDocRef = doc(db, `/artifacts/${appId}/public/data/sweets`, id);
+            
+            if (target.classList.contains('edit-btn')) {
+                try {
+                    const docSnap = await getDoc(sweetDocRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        document.getElementById('sweet-id').value = docSnap.id;
+                        document.getElementById('name').value = data.name;
+                        document.getElementById('price').value = data.price;
+                        document.getElementById('description').value = data.description;
+                        document.getElementById('unit').value = data.unit;
+                        document.getElementById('image').value = data.image;
+                        document.getElementById('inStock').checked = data.inStock;
+                        document.getElementById('bestSeller').checked = data.bestSeller;
+                        modalTitle.textContent = `Edit ${data.name}`;
+                        openModal();
+                    }
+                } catch (error) {
+                    console.error("Error fetching sweet for edit:", error);
+                }
+            }
+
+            if (target.classList.contains('delete-btn')) {
+                try {
+                    await deleteDoc(sweetDocRef);
+                } catch (error) {
+                    console.error("Error deleting sweet:", error);
+                }
+            }
+        });
+        
+        ordersTableBody.addEventListener('click', async (e) => {
+            const target = e.target.closest('button.complete-order-btn');
+            if (!target) return;
+            
+            const id = target.dataset.id;
+            const orderDocRef = doc(db, `/artifacts/${appId}/public/data/orders`, id);
+            try {
+                await updateDoc(orderDocRef, { status: 'completed' });
+            } catch (error) {
+                console.error("Error completing order:", error);
+            }
+        });
+
+        // --- Gemini API Logic ---
+        const apiKey = ""; // API key will be injected by the environment.
+
+        async function callGeminiForText(prompt) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    return result.candidates[0].content.parts[0].text;
+                }
+            } catch (error) {
+                console.error("Gemini API call error:", error);
+                return null;
+            }
+            return null;
+        }
+
+        generateDescBtn.addEventListener('click', async () => {
+            const sweetName = document.getElementById('name').value;
+            if (!sweetName) {
+                alert("Please enter a sweet name first.");
+                return;
+            }
+
+            const originalButtonText = generateDescBtn.innerHTML;
+            generateDescBtn.innerHTML = '<span class="loader"></span>';
+            generateDescBtn.disabled = true;
+
+            const prompt = `Create a short, delicious, and marketable menu description for an Indian sweet called "${sweetName}". The description should be one or two sentences long.`;
+            
+            const generatedDesc = await callGeminiForText(prompt);
+
+            if (generatedDesc) {
+                document.getElementById('description').value = generatedDesc.trim();
+            } else {
+                alert("Sorry, we couldn't generate a description. Please try again.");
+            }
+
+            generateDescBtn.innerHTML = originalButtonText;
+            generateDescBtn.disabled = false;
+        });
+
+        // --- Run the main function to start the app ---
+        main();
+
+    </script>
+</body>
+</html>
