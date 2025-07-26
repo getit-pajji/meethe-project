@@ -33,36 +33,6 @@
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFDAB9' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         
-        /* Tic-Tac-Toe Game Styling - Fixed container */
-        .game-container {
-            min-height: 450px; /* Fixed height for the container */
-        }
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            width: 300px;
-            height: 300px;
-            margin: 20px auto;
-        }
-        .cell {
-            background-color: #fff;
-            border: 2px solid #FFDAB9; /* Peach color */
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .cell:hover {
-            background-color: #FFF0E1;
-        }
-        .cell.x { color: #FF6B6B; } /* Brand Pink */
-        .cell.o { color: #48BB78; } /* Brand Teal */
-
         /* Disabled button style */
         .disabled-button {
             background-color: #D1D5DB;
@@ -85,9 +55,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        .modal { display: none; }
-        .modal.active { display: flex; }
-
         /* Transparent, rounded buttons */
         .btn-style {
             background-color: rgba(255, 107, 107, 0.85); /* Semi-transparent pink */
@@ -109,6 +76,27 @@
             transform: perspective(1000px) rotateY(-5deg) rotateX(5deg) scale(1.05);
             box-shadow: 20px 20px 30px rgba(0, 0, 0, 0.2);
         }
+
+        /* Star Rating */
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 2.5rem;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #f59e0b;
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -119,10 +107,9 @@
             <h1 class="text-4xl font-pacifico text-brand-pink">Meethe</h1>
             <nav class="hidden md:flex space-x-8 font-semibold">
                 <a href="#home" class="text-gray-600 hover:text-brand-pink transition duration-300">Home</a>
+                <a href="#news" class="text-gray-600 hover:text-brand-pink transition duration-300">News</a>
                 <a href="#catalog" class="text-gray-600 hover:text-brand-pink transition duration-300">Catalog</a>
-                <a href="#how-to-order" class="text-gray-600 hover:text-brand-pink transition duration-300">How to Order</a>
-                <a href="#suggestions" class="text-gray-600 hover:text-brand-pink transition duration-300">Suggestions</a>
-                <a href="#game" class="text-gray-600 hover:text-brand-pink transition duration-300">Fun Zone</a>
+                <a href="#reviews" class="text-gray-600 hover:text-brand-pink transition duration-300">Reviews</a>
                 <a href="#contact" class="text-gray-600 hover:text-brand-pink transition duration-300">Contact</a>
             </nav>
             <button id="mobile-menu-button" class="md:hidden text-brand-pink">
@@ -132,10 +119,9 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white">
             <a href="#home" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Home</a>
+            <a href="#news" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">News</a>
             <a href="#catalog" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Catalog</a>
-            <a href="#how-to-order" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">How to Order</a>
-            <a href="#suggestions" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Suggestions</a>
-            <a href="#game" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Fun Zone</a>
+            <a href="#reviews" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Reviews</a>
             <a href="#contact" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Contact</a>
         </div>
     </header>
@@ -163,8 +149,19 @@
             </div>
         </section>
 
+        <!-- Latest News Section -->
+        <section id="news" class="py-20 px-6">
+            <div class="container mx-auto max-w-4xl text-center">
+                <h2 class="text-4xl md:text-6xl font-bold text-gray-800">Latest <span class="font-pacifico text-brand-pink">News & Offers</span></h2>
+                <div id="news-list" class="mt-12 space-y-6">
+                    <!-- News items will be loaded here -->
+                    <p class="text-gray-400">Loading latest announcements...</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Product Catalog Section -->
-        <section id="catalog" class="py-20">
+        <section id="catalog" class="py-20 bg-brand-pink/10">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-16">
                     <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Our <span class="font-pacifico text-brand-pink">Sweet</span> Catalog</h2>
@@ -177,91 +174,46 @@
             </div>
         </section>
         
-        <!-- How to Order Section -->
-        <section id="how-to-order" class="py-20 bg-brand-yellow/20">
-            <div class="container mx-auto px-6 text-center">
-                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800">How to <span class="font-pacifico text-brand-orange">Order</span></h2>
-                <div class="mt-10 max-w-2xl mx-auto text-left space-y-6">
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-bold">1</div>
-                        <div>
-                            <h3 class="font-bold text-xl">Browse Our Sweets</h3>
-                            <p class="text-gray-600">Explore our catalog and find the perfect treat to satisfy your craving.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-bold">2</div>
-                        <div>
-                            <h3 class="font-bold text-xl">Order on WhatsApp</h3>
-                            <p class="text-gray-600">Click the "Order on WhatsApp" button for your chosen sweet. This will open a chat with us with a pre-filled message.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-bold">3</div>
-                        <div>
-                            <h3 class="font-bold text-xl">Confirm & Pay</h3>
-                            <p class="text-gray-600">Let us know your desired quantity (e.g., 500g or 4 pieces) in the chat. We'll confirm your order and provide payment details.</p>
-                        </div>
-                    </div>
+        <!-- Reviews & Suggestions Section -->
+        <section id="reviews" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Reviews & <span class="font-pacifico text-brand-teal">Suggestions</span></h2>
+                    <p class="mt-4 text-lg text-gray-600">See what others are saying or leave your own feedback!</p>
                 </div>
-            </div>
-        </section>
-
-        <!-- Suggestions Section -->
-        <section id="suggestions" class="py-20 bg-brand-teal/10">
-            <div class="container mx-auto px-6 text-center">
-                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Have a <span class="font-pacifico text-brand-teal">Sweet</span> Idea?</h2>
-                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Craving something special? Let us know what sweets you'd love to see on our menu!</p>
-                <div class="mt-10 max-w-xl mx-auto">
-                    <form id="suggestion-form" class="bg-white p-8 rounded-2xl shadow-lg">
-                        <textarea id="suggestion-text" class="w-full p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-transparent transition" rows="4" placeholder="e.g., 'I would love to see Chocolate Barfi!'"></textarea>
-                        <div class="flex flex-col sm:flex-row gap-4 mt-4">
-                             <button type="button" id="enhance-suggestion-button" class="btn-style w-full sm:w-1/2 bg-brand-orange/80 text-white font-bold px-8 py-3 text-lg">✨ Enhance My Idea!</button>
-                             <button type="submit" class="btn-style w-full sm:w-1/2 bg-brand-teal/80 text-white font-bold px-8 py-3 text-lg">Submit Suggestion</button>
-                        </div>
-                    </form>
-                    <div id="suggestion-thanks" class="hidden mt-6 p-4 bg-green-100 text-green-800 rounded-lg">
-                        <p>Thank you! We've received your sweet suggestion. 🎉</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Leave a Review Form -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4">Leave a Review</h3>
+                        <form id="suggestion-form">
+                            <div class="star-rating mb-4">
+                                <input type="radio" id="5-stars" name="rating" value="5" /><label for="5-stars" class="fas fa-star"></label>
+                                <input type="radio" id="4-stars" name="rating" value="4" /><label for="4-stars" class="fas fa-star"></label>
+                                <input type="radio" id="3-stars" name="rating" value="3" /><label for="3-stars" class="fas fa-star"></label>
+                                <input type="radio" id="2-stars" name="rating" value="2" /><label for="2-stars" class="fas fa-star"></label>
+                                <input type="radio" id="1-star" name="rating" value="1" checked /><label for="1-star" class="fas fa-star"></label>
+                            </div>
+                            <div>
+                                <label for="review-name" class="block text-sm font-medium text-gray-700">Your Name</label>
+                                <input type="text" id="review-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-teal">
+                            </div>
+                            <div class="mt-4">
+                                <label for="suggestion-text" class="block text-sm font-medium text-gray-700">Your Review or Suggestion</label>
+                                <textarea id="suggestion-text" class="mt-1 w-full p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-transparent transition" rows="4" placeholder="e.g., 'The Gulab Jamun was amazing!'"></textarea>
+                            </div>
+                            <button type="submit" class="w-full mt-6 btn-style bg-brand-teal/80 text-white font-bold px-8 py-3 text-lg">Submit</button>
+                        </form>
                     </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- Fun Zone Section -->
-        <section id="game" class="py-20 doodle-bg">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Fun Zone</h2>
-                <p class="mt-4 text-lg text-gray-600 mb-8">Play a game or check out our e-sports tournaments!</p>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <!-- Tic Tac Toe Game -->
-                    <div class="max-w-sm mx-auto bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Quick Game</h3>
-                        <div id="status" class="text-xl font-semibold mb-2 h-8 text-brand-pink">Player X's turn</div>
-                        <div id="game-board" class="game-board" style="width: 250px; height: 250px; font-size: 2.5rem; margin: 10px auto;">
-                            <!-- Cells will be generated by JS -->
-                        </div>
-                        <button id="reset-button" class="mt-4 btn-style bg-brand-pink/80 text-white font-bold px-8 py-3">Reset Game</button>
-                    </div>
-
-                    <!-- E-Sports Tournament Plugin -->
-                    <div id="esports-plugin" class="max-w-md mx-auto bg-gray-800 text-white p-8 rounded-2xl shadow-lg border-4 border-brand-yellow transform hover:scale-105 transition-transform duration-300">
-                        <div class="flex items-center justify-center mb-4">
-                             <i class="fas fa-trophy text-brand-yellow text-4xl mr-4"></i>
-                             <h3 class="text-3xl font-bold">E-Sports Arena</h3>
-                        </div>
-                        <p class="text-gray-300 mb-6">Join our weekly tournaments and compete for sweet prizes and glory!</p>
-                        <a href="https://vice-city-side-project-djw5.vercel.app/" target="_blank" class="btn-style bg-brand-yellow/90 text-gray-900 font-bold px-8 py-4 text-lg inline-block">
-                            View Tournaments
-                        </a>
+                    <!-- Display Reviews -->
+                    <div id="suggestions-list" class="space-y-4 max-h-[32rem] overflow-y-auto">
+                        <p class="text-center text-gray-500">Loading reviews...</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="py-20">
+        <section id="contact" class="py-20 bg-gray-100">
             <div class="container mx-auto px-6 text-center">
                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Say <span class="font-pacifico text-brand-pink">Hello!</span></h2>
                 <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">For party orders, questions, or just to share your love for sweets!</p>
@@ -295,21 +247,18 @@
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', function() {
             // --- DOM Elements ---
             const mainContent = document.getElementById('main-content');
             const catalogGrid = document.getElementById('catalog-grid');
-            const enhanceSuggestionButton = document.getElementById('enhance-suggestion-button');
-            const suggestionText = document.getElementById('suggestion-text');
             const suggestionForm = document.getElementById('suggestion-form');
             const suggestionThanks = document.getElementById('suggestion-thanks');
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            const gameBoard = document.getElementById('game-board');
-            const statusDisplay = document.getElementById('status');
-            const resetButton = document.getElementById('reset-button');
+            const newsList = document.getElementById('news-list');
+            const suggestionsList = document.getElementById('suggestions-list');
             
             let sweetsData = []; // This will be populated from Firestore
             let db, auth, appId;
@@ -342,6 +291,8 @@
                     if (user) {
                         console.log("User authenticated with UID:", user.uid);
                         loadSweetsFromFirestore();
+                        loadNews();
+                        loadReviews();
                     }
                 });
 
@@ -365,6 +316,58 @@
                 }, (error) => {
                     console.error("Error fetching sweets:", error);
                     if(catalogGrid) catalogGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error loading sweets: ${error.message}</p>`;
+                });
+            }
+
+            function loadNews() {
+                const newsCollection = collection(db, `/artifacts/${appId}/public/data/news`);
+                onSnapshot(newsCollection, (snapshot) => {
+                    newsList.innerHTML = '';
+                    if (snapshot.empty) {
+                        newsList.innerHTML = '<p class="text-gray-400">No news yet. Stay tuned!</p>';
+                        return;
+                    }
+                    const sortedDocs = snapshot.docs.sort((a, b) => (b.data().createdAt?.seconds || 0) - (a.data().createdAt?.seconds || 0));
+                    sortedDocs.forEach(doc => {
+                        const news = doc.data();
+                        const newsItem = document.createElement('div');
+                        newsItem.className = 'bg-white/80 backdrop-blur-sm p-6 rounded-lg text-left shadow-lg border border-gray-200';
+                        newsItem.innerHTML = `
+                            <h3 class="text-2xl font-bold text-brand-pink">${news.title}</h3>
+                            <p class="text-xs text-gray-500 mb-4">${news.createdAt?.toDate().toLocaleString()}</p>
+                            <p class="text-gray-700 whitespace-pre-wrap">${news.content}</p>
+                        `;
+                        newsList.appendChild(newsItem);
+                    });
+                });
+            }
+
+            function loadReviews() {
+                const reviewsCollection = collection(db, `/artifacts/${appId}/public/data/reviews`);
+                onSnapshot(reviewsCollection, (snapshot) => {
+                    suggestionsList.innerHTML = '';
+                    if (snapshot.empty) {
+                        suggestionsList.innerHTML = '<p class="text-center text-gray-500">No reviews yet. Be the first!</p>';
+                        return;
+                    }
+                    const sortedDocs = snapshot.docs.sort((a, b) => (b.data().createdAt?.seconds || 0) - (a.data().createdAt?.seconds || 0));
+                    sortedDocs.forEach(doc => {
+                        const review = doc.data();
+                        const reviewDiv = document.createElement('div');
+                        reviewDiv.className = 'bg-white p-4 rounded-lg shadow';
+                        let stars = '';
+                        for(let i = 0; i < 5; i++) {
+                            stars += `<i class="fas fa-star ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}"></i>`;
+                        }
+                        reviewDiv.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <p class="font-bold">${review.name}</p>
+                                <div class="flex">${stars}</div>
+                            </div>
+                            <p class="text-sm mt-2 text-gray-600">${review.text}</p>
+                        `;
+                        suggestionsList.appendChild(reviewDiv);
+                    });
                 });
             }
 
@@ -393,7 +396,7 @@
                                     <input type="number" value="1" min="1" class="quantity-input w-16 h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
                                     <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="1">+</button>
                                 </div>
-                                <button class="order-btn w-full mt-3 btn-style bg-green-500/90 text-white font-semibold py-3" data-id="${sweet.id}" data-name="${sweet.name}"><i class="fab fa-whatsapp mr-2"></i>Order on WhatsApp</button>
+                                <button class="order-btn w-full mt-3 btn-style bg-green-500/90 text-white font-semibold py-3" data-id="${sweet.id}" data-name="${sweet.name}" data-price="${sweet.price}"><i class="fab fa-whatsapp mr-2"></i>Order on WhatsApp</button>
                             `;
                         } else { // For 'kg'
                             const orderMessage = encodeURIComponent(`Hi! I'd like to order ${sweet.name}.`);
@@ -437,86 +440,40 @@
 
                 if (target.classList.contains('order-btn')) {
                     const sweetName = target.dataset.name;
+                    const price = parseFloat(target.dataset.price);
                     const parent = target.closest('.mt-auto');
                     const input = parent.querySelector('.quantity-input');
                     const quantity = input.value;
-                    const orderMessage = encodeURIComponent(`Hi! I'd like to order ${sweetName} (x${quantity}).`);
+                    const total = price * quantity;
+                    const orderMessage = encodeURIComponent(`Hi! I'd like to order ${sweetName} (x${quantity}). Total: ₹${total}`);
                     const whatsappLink = `https://wa.me/919313011448?text=${orderMessage}`;
                     window.open(whatsappLink, '_blank');
                 }
             });
             
-            async function callGeminiForText(prompt) {
-                const apiKey = ""; // Injected by environment
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                     if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
-                    const result = await response.json();
-                    if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
-                        return result.candidates[0].content.parts[0].text;
-                    }
-                } catch (error) {
-                    console.error("Gemini API call error:", error);
-                    return null;
-                }
-                return null;
-            }
+            suggestionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('review-name').value;
+                const text = document.getElementById('suggestion-text').value;
+                const rating = document.querySelector('input[name="rating"]:checked').value;
 
-            enhanceSuggestionButton.addEventListener('click', async () => { /* ... AI Suggestion Logic ... */ });
-            suggestionForm.addEventListener('submit', async (e) => { /* ... Suggestion Form Logic ... */ });
+                if (text.trim() !== '' && name.trim() !== '') {
+                    try {
+                        const reviewsCollection = collection(db, `/artifacts/${appId}/public/data/reviews`);
+                        await addDoc(reviewsCollection, { name, text, rating: parseInt(rating), createdAt: serverTimestamp() });
+                        suggestionThanks.classList.remove('hidden');
+                        suggestionForm.reset();
+                        setTimeout(() => {
+                            suggestionThanks.classList.add('hidden');
+                        }, 5000);
+                    } catch (error) {
+                        console.error("Error adding review: ", error);
+                        alert("Sorry, we couldn't save your review. Please try again.");
+                    }
+                }
+            });
             
             mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-
-            let currentPlayer = 'X', boardState = Array(9).fill(null), gameActive = true;
-            const winningConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            function handleCellClick(e) {
-                const i = parseInt(e.target.dataset.index);
-                if (boardState[i] || !gameActive) return;
-                boardState[i] = currentPlayer;
-                e.target.textContent = currentPlayer;
-                e.target.classList.add(currentPlayer.toLowerCase());
-                checkResult();
-            }
-            function checkResult() {
-                if (!statusDisplay) return; // Guard clause
-                let roundWon = winningConditions.some(c => c.every(i => boardState[i] === currentPlayer));
-                if (roundWon) {
-                    statusDisplay.textContent = `Player ${currentPlayer} wins!`;
-                    gameActive = false;
-                } else if (!boardState.includes(null)) {
-                    statusDisplay.textContent = 'Game is a draw!';
-                    gameActive = false;
-                } else {
-                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                    statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
-                }
-            }
-            function resetGame() {
-                if (!statusDisplay) return; // Guard clause
-                boardState.fill(null); gameActive = true; currentPlayer = 'X';
-                statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
-                document.querySelectorAll('.cell').forEach(c => { c.textContent = ''; c.classList.remove('x','o'); });
-            }
-            function createBoard() {
-                if (gameBoard && gameBoard.children.length === 0) {
-                    for (let i = 0; i < 9; i++) {
-                        const cell = document.createElement('div');
-                        cell.classList.add('cell');
-                        cell.dataset.index = i;
-                        cell.addEventListener('click', handleCellClick);
-                        gameBoard.appendChild(cell);
-                    }
-                }
-            }
-            createBoard();
-            if(resetButton) resetButton.addEventListener('click', resetGame);
 
             main();
         });
