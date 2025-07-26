@@ -68,22 +68,6 @@
             background-color: #D1D5DB;
             cursor: not-allowed;
         }
-
-        /* Shopping Cart Styles */
-        #cart-sidebar {
-            transition: transform 0.3s ease-in-out;
-        }
-        #cart-sidebar.translate-x-full {
-            transform: translateX(100%);
-        }
-        .quantity-input::-webkit-outer-spin-button,
-        .quantity-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .quantity-input {
-            -moz-appearance: textfield;
-        }
         
         /* Spinner for loading state */
         .loader {
@@ -99,12 +83,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        
-        /* Unit Toggle Active State */
-        .unit-toggle.active {
-            background-color: #FF6B6B;
-            color: white;
         }
         
         .modal { display: none; }
@@ -142,7 +120,7 @@
             <nav class="hidden md:flex space-x-8 font-semibold">
                 <a href="#home" class="text-gray-600 hover:text-brand-pink transition duration-300">Home</a>
                 <a href="#catalog" class="text-gray-600 hover:text-brand-pink transition duration-300">Catalog</a>
-                <a href="#track-order" class="text-gray-600 hover:text-brand-pink transition duration-300">Track Order</a>
+                <a href="#how-to-order" class="text-gray-600 hover:text-brand-pink transition duration-300">How to Order</a>
                 <a href="#suggestions" class="text-gray-600 hover:text-brand-pink transition duration-300">Suggestions</a>
                 <a href="#game" class="text-gray-600 hover:text-brand-pink transition duration-300">Fun Zone</a>
                 <a href="#contact" class="text-gray-600 hover:text-brand-pink transition duration-300">Contact</a>
@@ -155,7 +133,7 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white">
             <a href="#home" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Home</a>
             <a href="#catalog" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Catalog</a>
-            <a href="#track-order" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Track Order</a>
+            <a href="#how-to-order" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">How to Order</a>
             <a href="#suggestions" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Suggestions</a>
             <a href="#game" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Fun Zone</a>
             <a href="#contact" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Contact</a>
@@ -199,18 +177,31 @@
             </div>
         </section>
         
-        <!-- Track Order Section -->
-        <section id="track-order" class="py-20 bg-brand-yellow/20">
+        <!-- How to Order Section -->
+        <section id="how-to-order" class="py-20 bg-brand-yellow/20">
             <div class="container mx-auto px-6 text-center">
-                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Track Your <span class="font-pacifico text-brand-orange">Order</span></h2>
-                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Enter the phone number you used to place the order to see its status.</p>
-                <div class="mt-10 max-w-xl mx-auto">
-                    <form id="track-order-form" class="bg-white p-8 rounded-2xl shadow-lg flex flex-col sm:flex-row gap-4">
-                        <input type="tel" id="track-phone-input" class="w-full p-4 border-2 border-gray-200 rounded-full focus:ring-2 focus:ring-brand-orange focus:border-transparent transition" placeholder="Enter your 10-digit phone number">
-                        <button type="submit" class="btn-style bg-brand-orange/80 text-white font-bold px-8 py-3 text-lg">Track Order</button>
-                    </form>
-                    <div id="order-status-results" class="mt-6">
-                        <!-- Order status will be displayed here -->
+                 <h2 class="text-4xl md:text-5xl font-bold text-gray-800">How to <span class="font-pacifico text-brand-orange">Order</span></h2>
+                <div class="mt-10 max-w-2xl mx-auto text-left space-y-6">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-bold">1</div>
+                        <div>
+                            <h3 class="font-bold text-xl">Browse Our Sweets</h3>
+                            <p class="text-gray-600">Explore our catalog and find the perfect treat to satisfy your craving.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-bold">2</div>
+                        <div>
+                            <h3 class="font-bold text-xl">Order on WhatsApp</h3>
+                            <p class="text-gray-600">Click the "Order on WhatsApp" button for your chosen sweet. This will open a chat with us with a pre-filled message.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-bold">3</div>
+                        <div>
+                            <h3 class="font-bold text-xl">Confirm & Pay</h3>
+                            <p class="text-gray-600">Let us know your desired quantity (e.g., 500g or 4 pieces) in the chat. We'll confirm your order and provide payment details.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -300,70 +291,6 @@
         </div>
     </footer>
 
-    <!-- Floating Cart Button -->
-    <button id="cart-button" class="fixed bottom-6 right-6 bg-brand-pink/90 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center z-50 transform hover:scale-110 transition-transform">
-        <i class="fas fa-shopping-cart text-2xl"></i>
-        <span id="cart-item-count" class="absolute -top-1 -right-1 bg-brand-yellow text-gray-900 text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">0</span>
-    </button>
-
-    <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full">
-        <div class="flex flex-col h-full">
-            <div class="flex justify-between items-center p-6 border-b">
-                <h2 class="text-2xl font-bold text-gray-800">Your Sweet Cart</h2>
-                <button id="close-cart-button" class="text-gray-500 hover:text-gray-800">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
-                <!-- Cart items will be dynamically inserted here -->
-                <p id="empty-cart-message" class="text-gray-500">Your cart is empty. Add some sweets!</p>
-            </div>
-            <div class="p-6 border-t bg-gray-50">
-                <div id="ai-combo-suggester" class="hidden mb-4 p-4 bg-indigo-100 rounded-lg">
-                    <h4 class="font-bold text-indigo-800">Your Combo: <span id="combo-name"></span></h4>
-                    <p class="text-sm text-indigo-700" id="combo-description"></p>
-                </div>
-                <button id="suggest-combo-button" class="w-full mb-4 btn-style bg-brand-orange/80 text-white font-bold py-2 hidden">✨ Suggest a Combo!</button>
-
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-lg font-medium text-gray-600">Subtotal</span>
-                    <span id="cart-subtotal" class="text-2xl font-bold text-gray-900">₹0.00</span>
-                </div>
-                <button id="checkout-button" class="w-full btn-style bg-brand-teal/80 text-white font-bold py-3">Proceed to Checkout</button>
-            </div>
-        </div>
-    </div>
-    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-
-    <!-- Customer Info Modal -->
-    <div id="customer-info-modal" class="modal fixed inset-0 bg-black bg-opacity-60 items-center justify-center z-50">
-        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md m-4">
-            <h2 class="text-2xl font-bold mb-6">Your Delivery Details</h2>
-            <form id="customer-info-form">
-                <div class="space-y-4">
-                    <div>
-                        <label for="customer-name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                        <input type="text" id="customer-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-pink">
-                    </div>
-                    <div>
-                        <label for="customer-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <input type="tel" id="customer-phone" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-pink">
-                    </div>
-                    <div>
-                        <label for="customer-room" class="block text-sm font-medium text-gray-700">Hostel & Room No.</label>
-                        <input type="text" id="customer-room" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-pink">
-                    </div>
-                </div>
-                <div class="flex justify-end space-x-4 mt-8">
-                    <button type="button" id="cancel-order-btn" class="bg-gray-200 text-gray-800 font-bold px-4 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
-                    <button type="submit" class="bg-brand-teal text-white font-bold px-6 py-2 rounded-lg hover:bg-opacity-90">Place Order</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -374,22 +301,6 @@
             // --- DOM Elements ---
             const mainContent = document.getElementById('main-content');
             const catalogGrid = document.getElementById('catalog-grid');
-            const cartButton = document.getElementById('cart-button');
-            const cartSidebar = document.getElementById('cart-sidebar');
-            const closeCartButton = document.getElementById('close-cart-button');
-            const cartOverlay = document.getElementById('cart-overlay');
-            const cartItemsContainer = document.getElementById('cart-items');
-            const cartItemCount = document.getElementById('cart-item-count');
-            const cartSubtotal = document.getElementById('cart-subtotal');
-            const emptyCartMessage = document.getElementById('empty-cart-message');
-            const suggestComboButton = document.getElementById('suggest-combo-button');
-            const aiComboSuggester = document.getElementById('ai-combo-suggester');
-            const comboNameEl = document.getElementById('combo-name');
-            const comboDescriptionEl = document.getElementById('combo-description');
-            const checkoutButton = document.getElementById('checkout-button');
-            const customerInfoModal = document.getElementById('customer-info-modal');
-            const customerInfoForm = document.getElementById('customer-info-form');
-            const cancelOrderBtn = document.getElementById('cancel-order-btn');
             const enhanceSuggestionButton = document.getElementById('enhance-suggestion-button');
             const suggestionText = document.getElementById('suggestion-text');
             const suggestionForm = document.getElementById('suggestion-form');
@@ -399,12 +310,8 @@
             const gameBoard = document.getElementById('game-board');
             const statusDisplay = document.getElementById('status');
             const resetButton = document.getElementById('reset-button');
-            const trackOrderForm = document.getElementById('track-order-form');
-            const trackPhoneInput = document.getElementById('track-phone-input');
-            const orderStatusResults = document.getElementById('order-status-results');
             
             let sweetsData = []; // This will be populated from Firestore
-            let cart = [];
             let db, auth, appId;
 
             // --- Main App Function ---
@@ -444,28 +351,6 @@
                     }
                 } catch (error) {
                     console.error("Authentication failed:", error);
-                    let errorMessage = `<div class="text-red-500 text-center p-8">Error: Authentication failed. ${error.message}</div>`;
-                    if (error.code === 'auth/configuration-not-found') {
-                        errorMessage = `
-                            <div class="text-red-500 text-center p-8">
-                                <h2 class="font-bold text-lg mb-2">Error: Authentication Not Enabled</h2>
-                                <p class="mb-4">This usually means you need to enable an authentication method in your Firebase project.</p>
-                                <div class="text-left max-w-md mx-auto bg-red-50 p-4 rounded-lg border border-red-200">
-                                    <h3 class="font-bold mb-2">How to Fix:</h3>
-                                    <ol class="list-decimal list-inside space-y-1">
-                                        <li>Go to the <a href="https://console.firebase.google.com/" target="_blank" class="underline">Firebase Console</a> and select your project ('meethe-275ef').</li>
-                                        <li>In the left menu, go to <strong>Build > Authentication</strong>.</li>
-                                        <li>Click the <strong>"Get started"</strong> button if it appears.</li>
-                                        <li>Go to the <strong>"Sign-in method"</strong> tab.</li>
-                                        <li>Find <strong>"Anonymous"</strong> in the list and click the pencil icon to edit.</li>
-                                        <li><strong>Enable</strong> the toggle switch and click <strong>Save</strong>.</li>
-                                        <li>Reload this page.</li>
-                                    </ol>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    if(mainContent) mainContent.innerHTML = errorMessage;
                 }
             }
 
@@ -495,32 +380,25 @@
                     const card = document.createElement('div');
                     card.className = `bg-white rounded-xl shadow-lg p-6 text-center flex flex-col justify-between border-b-8 border-brand-pink`;
                     
-                    const availabilityBadge = sweet.inStock ? `<span class="absolute top-0 left-0 mt-3 ml-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">In Stock (${sweet.quantity || 0})</span>` : `<span class="absolute top-0 left-0 mt-3 ml-3 bg-gray-400 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>`;
+                    const availabilityBadge = sweet.inStock ? `<span class="absolute top-0 left-0 mt-3 ml-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">In Stock</span>` : `<span class="absolute top-0 left-0 mt-3 ml-3 bg-gray-400 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>`;
                     const bestSellerBadge = sweet.bestSeller ? `<span class="absolute top-0 right-0 mt-3 mr-3 bg-brand-yellow text-gray-900 text-xs font-bold px-3 py-1 rounded-full animate-pulse">Best Seller</span>` : '';
                     const priceDisplay = `₹${sweet.price} / ${sweet.unit}`;
-
+                    
                     let actionArea = '';
                     if (sweet.inStock && sweet.quantity > 0) {
                         if (sweet.unit === 'piece') {
-                            actionArea = `
-                                <div class="flex items-center justify-center space-x-3">
+                             actionArea = `
+                                <div class="flex items-center justify-center space-x-3 mb-3">
                                     <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="-1">-</button>
-                                    <input type="number" value="1" min="1" max="${sweet.quantity}" class="quantity-input w-16 h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
+                                    <input type="number" value="1" min="1" class="quantity-input w-16 h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
                                     <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="1">+</button>
                                 </div>
-                                <button class="add-to-cart-piece w-full mt-3 btn-style bg-brand-pink/80 text-white font-semibold py-3" data-id="${sweet.id}">Add to Cart</button>
+                                <button class="order-btn w-full mt-3 btn-style bg-green-500/90 text-white font-semibold py-3" data-id="${sweet.id}" data-name="${sweet.name}"><i class="fab fa-whatsapp mr-2"></i>Order on WhatsApp</button>
                             `;
-                        } else if (sweet.unit === 'kg') {
-                            actionArea = `
-                                <div class="flex items-center justify-center space-x-1 bg-gray-100 rounded-full p-1 my-2">
-                                    <button class="unit-toggle w-full rounded-full px-4 py-1 text-sm font-bold" data-id="${sweet.id}" data-unit="g">g</button>
-                                    <button class="unit-toggle active w-full rounded-full px-4 py-1 text-sm font-bold" data-id="${sweet.id}" data-unit="kg">kg</button>
-                                </div>
-                                <div class="flex items-center justify-center space-x-2">
-                                    <input type="number" value="0.25" step="0.25" min="0.25" max="${sweet.quantity}" class="quantity-input w-full h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
-                                </div>
-                                <button class="add-to-cart-weight w-full mt-3 btn-style bg-brand-pink/80 text-white font-semibold py-3" data-id="${sweet.id}">Add to Cart</button>
-                            `;
+                        } else { // For 'kg'
+                            const orderMessage = encodeURIComponent(`Hi! I'd like to order ${sweet.name}.`);
+                            const whatsappLink = `https://wa.me/919313011448?text=${orderMessage}`;
+                            actionArea = `<a href="${whatsappLink}" target="_blank" class="w-full mt-3 btn-style bg-green-500/90 text-white font-semibold py-3 inline-block"><i class="fab fa-whatsapp mr-2"></i>Order on WhatsApp</a>`;
                         }
                     } else {
                         actionArea = `<button class="w-full disabled-button text-white font-semibold py-3 rounded-full" disabled>Out of Stock</button>`;
@@ -545,219 +423,52 @@
                 });
             }
             
-            function toggleCart() {
-                cartSidebar.classList.toggle('translate-x-full');
-                cartOverlay.classList.toggle('hidden');
-            }
-
-            cartButton.addEventListener('click', toggleCart);
-            closeCartButton.addEventListener('click', toggleCart);
-            cartOverlay.addEventListener('click', toggleCart);
-
-            function addToCart(id, quantity, unit) {
-                const sweet = sweetsData.find(s => s.id === id);
-                if (!sweet) return;
-                const existingItem = cart.find(item => item.id === id);
-                if (existingItem) {
-                    if (sweet.unit === 'piece') existingItem.quantity += quantity;
-                    else if (sweet.unit === 'kg') existingItem.quantity += (unit === 'kg' ? quantity * 1000 : quantity);
-                } else {
-                    if (sweet.unit === 'piece') cart.push({ ...sweet, quantity });
-                    else if (sweet.unit === 'kg') cart.push({ ...sweet, quantity: (unit === 'kg' ? quantity * 1000 : quantity) });
-                }
-                updateCart();
-            }
-
-            function removeFromCart(id) {
-                cart = cart.filter(item => item.id !== id);
-                updateCart();
-            }
-
-            function updateCart() {
-                cartItemsContainer.innerHTML = '';
-                let subtotal = 0;
-                if (cart.length === 0) {
-                    emptyCartMessage.style.display = 'block';
-                    suggestComboButton.classList.add('hidden');
-                    aiComboSuggester.classList.add('hidden');
-                    checkoutButton.classList.add('disabled-button');
-                    checkoutButton.disabled = true;
-                } else {
-                    emptyCartMessage.style.display = 'none';
-                    suggestComboButton.classList.remove('hidden');
-                    checkoutButton.classList.remove('disabled-button');
-                    checkoutButton.disabled = false;
-                    cart.forEach(item => {
-                        let itemTotal = 0;
-                        let displayQuantity = '';
-                        if (item.unit === 'piece') {
-                            itemTotal = item.price * item.quantity;
-                            displayQuantity = `${item.quantity} pc`;
-                        } else if (item.unit === 'kg') {
-                            itemTotal = (item.price / 1000) * item.quantity;
-                            displayQuantity = item.quantity >= 1000 ? `${(item.quantity / 1000).toFixed(2)} kg` : `${item.quantity} g`;
-                        }
-                        subtotal += itemTotal;
-                        const cartItemElement = document.createElement('div');
-                        cartItemElement.className = 'flex items-center justify-between py-4 border-b';
-                        cartItemElement.innerHTML = `
-                            <div class="flex items-center">
-                                <img src="${item.image}" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/ffffff?text=Img';" alt="${item.name}" class="w-16 h-16 rounded-md object-cover mr-4 img-hover-effect">
-                                <div>
-                                    <h4 class="font-bold">${item.name}</h4>
-                                    <p class="text-sm text-gray-500">Qty: ${displayQuantity}</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="font-bold mr-4">₹${itemTotal.toFixed(2)}</span>
-                                <button class="remove-from-cart text-red-500 hover:text-red-700" data-id="${item.id}"><i class="fas fa-trash"></i></button>
-                            </div>
-                        `;
-                        cartItemsContainer.appendChild(cartItemElement);
-                    });
-                }
-                cartSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
-                cartItemCount.textContent = cart.length;
-                cartItemCount.classList.toggle('hidden', cart.length === 0);
-            }
-
             catalogGrid.addEventListener('click', e => {
                 const target = e.target.closest('button');
                 if (!target) return;
-                const id = parseInt(target.dataset.id);
-                if (target.classList.contains('unit-toggle')) {
-                    const unit = target.dataset.unit;
-                    const parent = target.closest('.mt-auto');
-                    parent.querySelectorAll('.unit-toggle').forEach(btn => btn.classList.remove('active'));
-                    target.classList.add('active');
-                    const input = parent.querySelector('.quantity-input');
-                    if (unit === 'kg') {
-                        input.step = 0.25; input.min = 0.25; input.value = 0.25;
-                    } else {
-                        input.step = 50; input.min = 50; input.value = 100;
-                    }
-                }
-                if (target.classList.contains('add-to-cart-weight')) {
-                     const parent = target.closest('.mt-auto');
-                     const activeUnit = parent.querySelector('.unit-toggle.active').dataset.unit;
-                     const quantity = parseFloat(parent.querySelector('.quantity-input').value);
-                     addToCart(id, quantity, activeUnit);
-                }
-                if (target.classList.contains('add-to-cart-piece')) {
-                    const input = target.previousElementSibling.querySelector('input');
-                    const quantity = parseInt(input.value);
-                    addToCart(id, quantity, 'piece');
-                }
+
                 if (target.classList.contains('quantity-change')) {
                     const change = parseInt(target.dataset.change);
-                    const input = target.parentElement.querySelector('input');
+                    const input = target.parentElement.querySelector('.quantity-input');
                     let currentValue = parseInt(input.value);
                     currentValue = Math.max(1, currentValue + change);
                     input.value = currentValue;
                 }
+
+                if (target.classList.contains('order-btn')) {
+                    const sweetName = target.dataset.name;
+                    const parent = target.closest('.mt-auto');
+                    const input = parent.querySelector('.quantity-input');
+                    const quantity = input.value;
+                    const orderMessage = encodeURIComponent(`Hi! I'd like to order ${sweetName} (x${quantity}).`);
+                    const whatsappLink = `https://wa.me/919313011448?text=${orderMessage}`;
+                    window.open(whatsappLink, '_blank');
+                }
             });
             
-            cartItemsContainer.addEventListener('click', e => {
-                 const target = e.target.closest('button.remove-from-cart');
-                 if(target) removeFromCart(parseInt(target.dataset.id));
-            });
-
-            checkoutButton.addEventListener('click', () => {
-                if (cart.length > 0) customerInfoModal.classList.add('active');
-            });
-            cancelOrderBtn.addEventListener('click', () => {
-                customerInfoModal.classList.remove('active');
-            });
-
-            customerInfoForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const orderData = {
-                    customer: {
-                        name: document.getElementById('customer-name').value,
-                        phone: document.getElementById('customer-phone').value,
-                        room: document.getElementById('customer-room').value,
-                    },
-                    items: cart.map(item => ({
-                        id: item.id, name: item.name, quantity: item.quantity, unit: item.unit,
-                        displayQuantity: item.unit === 'kg' ? (item.quantity >= 1000 ? `${(item.quantity / 1000).toFixed(2)} kg` : `${item.quantity} g`) : `${item.quantity} pc`
-                    })),
-                    subtotal: parseFloat(cartSubtotal.textContent.replace('₹', '')),
-                    status: 'pending',
-                    createdAt: serverTimestamp()
-                };
+            async function callGeminiForText(prompt) {
+                const apiKey = ""; // Injected by environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                
                 try {
-                    const ordersCollection = collection(db, `/artifacts/${appId}/public/data/orders`);
-                    await addDoc(ordersCollection, orderData);
-                    alert('Thank you! Your order has been placed.');
-                    cart = [];
-                    updateCart();
-                    customerInfoForm.reset();
-                    customerInfoModal.classList.remove('active');
-                    toggleCart();
-                } catch (error) {
-                    console.error("Error placing order: ", error);
-                    alert("Sorry, there was an issue placing your order. Please try again.");
-                }
-            });
-
-            trackOrderForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const phone = trackPhoneInput.value.trim();
-                if (phone.length < 10) {
-                    orderStatusResults.innerHTML = `<p class="text-red-500">Please enter a valid 10-digit phone number.</p>`;
-                    return;
-                }
-                orderStatusResults.innerHTML = `<p class="text-gray-500">Searching for your orders...</p>`;
-
-                try {
-                    const ordersCollection = collection(db, `/artifacts/${appId}/public/data/orders`);
-                    const q = query(ordersCollection, where("customer.phone", "==", phone));
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (querySnapshot.empty) {
-                        orderStatusResults.innerHTML = `<p class="text-center text-gray-600 bg-white p-4 rounded-lg shadow">No orders found for this phone number.</p>`;
-                        return;
-                    }
-
-                    let resultsHtml = '';
-                    const sortedDocs = querySnapshot.docs.sort((a, b) => (b.data().createdAt?.seconds || 0) - (a.data().createdAt?.seconds || 0));
-
-                    sortedDocs.forEach(doc => {
-                        const order = doc.data();
-                        const orderTime = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : 'N/A';
-                        let statusClass = '';
-                        switch(order.status) {
-                            case 'pending': statusClass = 'bg-yellow-200 text-yellow-800'; break;
-                            case 'confirmed': statusClass = 'bg-blue-200 text-blue-800'; break;
-                            case 'completed': statusClass = 'bg-green-200 text-green-800'; break;
-                            default: statusClass = 'bg-gray-200 text-gray-800';
-                        }
-
-                        resultsHtml += `
-                            <div class="bg-white p-4 rounded-lg shadow text-left mb-4">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold">Order from ${orderTime}</p>
-                                    <span class="${statusClass} text-xs font-medium px-2.5 py-0.5 rounded-full capitalize">${order.status}</span>
-                                </div>
-                                <ul class="list-disc list-inside mt-2 text-gray-600">
-                                    ${order.items.map(item => `<li>${item.name} (${item.displayQuantity})</li>`).join('')}
-                                </ul>
-                                <p class="text-right font-bold mt-2">Total: ₹${order.subtotal.toFixed(2)}</p>
-                            </div>
-                        `;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
                     });
-                    orderStatusResults.innerHTML = resultsHtml;
-
+                     if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                        return result.candidates[0].content.parts[0].text;
+                    }
                 } catch (error) {
-                    console.error("Error tracking order:", error);
-                    orderStatusResults.innerHTML = `<p class="text-red-500">Could not fetch orders. Please try again later.</p>`;
+                    console.error("Gemini API call error:", error);
+                    return null;
                 }
-            });
+                return null;
+            }
 
-            async function callGemini(prompt) { /* ... Gemini Call Logic ... */ }
-            async function callGeminiForText(prompt) { /* ... Gemini Call Logic ... */ }
-
-            suggestComboButton.addEventListener('click', async () => { /* ... AI Combo Logic ... */ });
             enhanceSuggestionButton.addEventListener('click', async () => { /* ... AI Suggestion Logic ... */ });
             suggestionForm.addEventListener('submit', async (e) => { /* ... Suggestion Form Logic ... */ });
             
