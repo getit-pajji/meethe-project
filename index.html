@@ -33,26 +33,41 @@
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFDAB9' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         
+        /* Tic-Tac-Toe Game Styling */
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .cell {
+            background-color: #fff;
+            border: 2px solid #FFDAB9; /* Peach color */
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cell:hover {
+            background-color: #FFF0E1;
+        }
+        .cell.x { color: #FF6B6B; } /* Brand Pink */
+        .cell.o { color: #48BB78; } /* Brand Teal */
+
         /* Disabled button style */
         .disabled-button {
             background-color: #D1D5DB;
             cursor: not-allowed;
         }
-        
-        /* Spinner for loading state */
-        .loader {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #FF6B6B;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
+
+        /* Shopping Cart Styles */
+        #cart-sidebar {
+            transition: transform 0.3s ease-in-out;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #cart-sidebar.translate-x-full {
+            transform: translateX(100%);
         }
         
         /* Transparent, rounded buttons */
@@ -75,6 +90,16 @@
         .img-hover-effect:hover {
             transform: perspective(1000px) rotateY(-5deg) rotateX(5deg) scale(1.05);
             box-shadow: 20px 20px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Cart Button Pulse Animation */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(255, 107, 107, 1);
+            }
         }
 
         /* Star Rating */
@@ -110,6 +135,7 @@
                 <a href="#news" class="text-gray-600 hover:text-brand-pink transition duration-300">News</a>
                 <a href="#catalog" class="text-gray-600 hover:text-brand-pink transition duration-300">Catalog</a>
                 <a href="#reviews" class="text-gray-600 hover:text-brand-pink transition duration-300">Reviews</a>
+                <a href="#game" class="text-gray-600 hover:text-brand-pink transition duration-300">Fun Zone</a>
                 <a href="#contact" class="text-gray-600 hover:text-brand-pink transition duration-300">Contact</a>
             </nav>
             <button id="mobile-menu-button" class="md:hidden text-brand-pink">
@@ -122,6 +148,7 @@
             <a href="#news" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">News</a>
             <a href="#catalog" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Catalog</a>
             <a href="#reviews" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Reviews</a>
+            <a href="#game" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Fun Zone</a>
             <a href="#contact" class="block py-2 px-6 text-sm text-gray-700 hover:bg-brand-pink hover:text-white">Contact</a>
         </div>
     </header>
@@ -212,6 +239,38 @@
             </div>
         </section>
 
+        <!-- Fun Zone Section -->
+        <section id="game" class="py-20 doodle-bg">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Fun Zone</h2>
+                <p class="mt-4 text-lg text-gray-600 mb-8">Play a game or check out our e-sports tournaments!</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <!-- Tic Tac Toe Game -->
+                    <div class="max-w-sm mx-auto bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Quick Game</h3>
+                        <div id="status" class="text-xl font-semibold mb-2 h-8 text-brand-pink">Player X's turn</div>
+                        <div id="game-board" class="game-board" style="width: 250px; height: 250px; font-size: 2.5rem; margin: 10px auto;">
+                            <!-- Cells will be generated by JS -->
+                        </div>
+                        <button id="reset-button" class="mt-4 btn-style bg-brand-pink/80 text-white font-bold px-8 py-3">Reset Game</button>
+                    </div>
+
+                    <!-- E-Sports Tournament Plugin -->
+                    <div id="esports-plugin" class="max-w-md mx-auto bg-gray-800 text-white p-8 rounded-2xl shadow-lg border-4 border-brand-yellow transform hover:scale-105 transition-transform duration-300">
+                        <div class="flex items-center justify-center mb-4">
+                             <i class="fas fa-trophy text-brand-yellow text-4xl mr-4"></i>
+                             <h3 class="text-3xl font-bold">E-Sports Arena</h3>
+                        </div>
+                        <p class="text-gray-300 mb-6">Join our weekly tournaments and compete for sweet prizes and glory!</p>
+                        <a href="https://vice-city-side-project-djw5.vercel.app/" target="_blank" class="btn-style bg-brand-yellow/90 text-gray-900 font-bold px-8 py-4 text-lg inline-block">
+                            View Tournaments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Contact Section -->
         <section id="contact" class="py-20 bg-gray-100">
             <div class="container mx-auto px-6 text-center">
@@ -219,8 +278,8 @@
                 <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">For party orders, questions, or just to share your love for sweets!</p>
                 <div class="mt-10 max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border-t-8 border-brand-yellow">
                     <p class="text-gray-700">Drop us a message on WhatsApp:</p>
-                    <a href="https://wa.me/919313011448" target="_blank" class="mt-4 inline-block text-2xl font-bold text-green-500 hover:text-green-600 transition">
-                        <i class="fab fa-whatsapp mr-2"></i> +91 9313011448
+                    <a href="https://wa.me/919137734564" target="_blank" class="mt-4 inline-block text-2xl font-bold text-green-500 hover:text-green-600 transition">
+                        <i class="fab fa-whatsapp mr-2"></i> +91 9137734564
                     </a>
                     <p class="mt-6 text-gray-700">Or email us at:</p>
                     <a href="mailto:getitopen12345@gmail.com" class="mt-1 inline-block text-lg font-semibold text-brand-pink hover:underline">
@@ -243,6 +302,36 @@
         </div>
     </footer>
 
+    <!-- Floating Cart Button -->
+    <button id="cart-button" class="fixed bottom-8 right-8 bg-brand-pink text-white w-20 h-20 rounded-full shadow-2xl flex items-center justify-center z-50 transform hover:scale-110 transition-transform" style="animation: pulse-glow 3s infinite ease-in-out;">
+        <i class="fas fa-shopping-cart text-3xl"></i>
+        <span id="cart-item-count" class="absolute -top-1 -right-1 bg-brand-yellow text-gray-900 text-sm font-bold rounded-full h-8 w-8 flex items-center justify-center border-2 border-white">0</span>
+    </button>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full">
+        <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">Your Sweet Cart</h2>
+                <button id="close-cart-button" class="text-gray-500 hover:text-gray-800">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
+                <!-- Cart items will be dynamically inserted here -->
+                <p id="empty-cart-message" class="text-gray-500">Your cart is empty. Add some sweets!</p>
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-medium text-gray-600">Subtotal</span>
+                    <span id="cart-subtotal" class="text-2xl font-bold text-gray-900">₹0.00</span>
+                </div>
+                <a id="whatsapp-order-link" href="#" target="_blank" class="w-full btn-style bg-green-500/90 text-white font-bold py-3 text-center inline-block"><i class="fab fa-whatsapp mr-2"></i>Order on WhatsApp</a>
+            </div>
+        </div>
+    </div>
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -253,6 +342,15 @@
             // --- DOM Elements ---
             const mainContent = document.getElementById('main-content');
             const catalogGrid = document.getElementById('catalog-grid');
+            const cartButton = document.getElementById('cart-button');
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const closeCartButton = document.getElementById('close-cart-button');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartItemCount = document.getElementById('cart-item-count');
+            const cartSubtotal = document.getElementById('cart-subtotal');
+            const emptyCartMessage = document.getElementById('empty-cart-message');
+            const whatsappOrderLink = document.getElementById('whatsapp-order-link');
             const suggestionForm = document.getElementById('suggestion-form');
             const suggestionThanks = document.getElementById('suggestion-thanks');
             const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -261,6 +359,7 @@
             const suggestionsList = document.getElementById('suggestions-list');
             
             let sweetsData = []; // This will be populated from Firestore
+            let cart = [];
             let db, auth, appId;
 
             // --- Main App Function ---
@@ -389,20 +488,7 @@
                     
                     let actionArea = '';
                     if (sweet.inStock && sweet.quantity > 0) {
-                        if (sweet.unit === 'piece') {
-                             actionArea = `
-                                <div class="flex items-center justify-center space-x-3 mb-3">
-                                    <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="-1">-</button>
-                                    <input type="number" value="1" min="1" class="quantity-input w-16 h-10 text-center font-bold border-2 border-gray-200 rounded-lg" data-id="${sweet.id}">
-                                    <button class="quantity-change w-10 h-10 rounded-full bg-gray-200 text-lg font-bold hover:bg-gray-300" data-id="${sweet.id}" data-change="1">+</button>
-                                </div>
-                                <button class="order-btn w-full mt-3 btn-style bg-green-500/90 text-white font-semibold py-3" data-id="${sweet.id}" data-name="${sweet.name}" data-price="${sweet.price}"><i class="fab fa-whatsapp mr-2"></i>Order on WhatsApp</button>
-                            `;
-                        } else { // For 'kg'
-                            const orderMessage = encodeURIComponent(`Hi! I'd like to order ${sweet.name}.`);
-                            const whatsappLink = `https://wa.me/919313011448?text=${orderMessage}`;
-                            actionArea = `<a href="${whatsappLink}" target="_blank" class="w-full mt-3 btn-style bg-green-500/90 text-white font-semibold py-3 inline-block"><i class="fab fa-whatsapp mr-2"></i>Order on WhatsApp</a>`;
-                        }
+                        actionArea = `<button class="add-to-cart-btn w-full mt-3 btn-style bg-brand-pink/80 text-white font-semibold py-3" data-id="${sweet.id}">Add to Cart</button>`;
                     } else {
                         actionArea = `<button class="w-full disabled-button text-white font-semibold py-3 rounded-full" disabled>Out of Stock</button>`;
                     }
@@ -426,31 +512,136 @@
                 });
             }
             
-            catalogGrid.addEventListener('click', e => {
-                const target = e.target.closest('button');
-                if (!target) return;
+            function toggleCart() {
+                cartSidebar.classList.toggle('translate-x-full');
+                cartOverlay.classList.toggle('hidden');
+            }
 
-                if (target.classList.contains('quantity-change')) {
-                    const change = parseInt(target.dataset.change);
-                    const input = target.parentElement.querySelector('.quantity-input');
-                    let currentValue = parseInt(input.value);
-                    currentValue = Math.max(1, currentValue + change);
-                    input.value = currentValue;
+            cartButton.addEventListener('click', toggleCart);
+            closeCartButton.addEventListener('click', toggleCart);
+            cartOverlay.addEventListener('click', toggleCart);
+
+            function addToCart(id) {
+                const sweet = sweetsData.find(s => s.id == id);
+                if (!sweet) return;
+
+                const existingItem = cart.find(item => item.id == id);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ ...sweet, quantity: 1 });
                 }
+                updateCart();
+            }
 
-                if (target.classList.contains('order-btn')) {
-                    const sweetName = target.dataset.name;
-                    const price = parseFloat(target.dataset.price);
-                    const parent = target.closest('.mt-auto');
-                    const input = parent.querySelector('.quantity-input');
-                    const quantity = input.value;
-                    const total = price * quantity;
-                    const orderMessage = encodeURIComponent(`Hi! I'd like to order ${sweetName} (x${quantity}). Total: ₹${total}`);
-                    const whatsappLink = `https://wa.me/919313011448?text=${orderMessage}`;
-                    window.open(whatsappLink, '_blank');
+            function removeFromCart(id) {
+                cart = cart.filter(item => item.id != id);
+                updateCart();
+            }
+
+            function updateCartQuantity(id, change) {
+                const cartItem = cart.find(item => item.id == id);
+                if (cartItem) {
+                    cartItem.quantity += change;
+                    if (cartItem.quantity <= 0) {
+                        removeFromCart(id);
+                    }
+                }
+                updateCart();
+            }
+
+            function updateCart() {
+                cartItemsContainer.innerHTML = '';
+                let subtotal = 0;
+                if (cart.length === 0) {
+                    emptyCartMessage.style.display = 'block';
+                    whatsappOrderLink.classList.add('hidden');
+                } else {
+                    emptyCartMessage.style.display = 'none';
+                    whatsappOrderLink.classList.remove('hidden');
+                    cart.forEach(item => {
+                        let itemTotal = 0;
+                        let displayQuantity = '';
+                        const baseUnitQuantity = item.unit === 'kg' ? 0.25 : 1;
+
+                        itemTotal = item.price * item.quantity * (item.unit === 'kg' ? 0.25 : 1);
+                        displayQuantity = item.unit === 'kg' ? `${item.quantity * 250} g` : `${item.quantity} pc`;
+                        
+                        subtotal += itemTotal;
+                        const cartItemElement = document.createElement('div');
+                        cartItemElement.className = 'flex items-center justify-between py-4 border-b';
+                        cartItemElement.innerHTML = `
+                            <div class="flex items-center">
+                                <img src="${item.image}" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/ffffff?text=Img';" alt="${item.name}" class="w-16 h-16 rounded-md object-cover mr-4 img-hover-effect">
+                                <div>
+                                    <h4 class="font-bold">${item.name}</h4>
+                                    <div class="flex items-center mt-1">
+                                        <button class="cart-quantity-change w-6 h-6 rounded-full bg-gray-200 font-bold" data-id="${item.id}" data-change="-1">-</button>
+                                        <span class="w-12 text-center">${displayQuantity}</span>
+                                        <button class="cart-quantity-change w-6 h-6 rounded-full bg-gray-200 font-bold" data-id="${item.id}" data-change="1">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-bold mr-4">₹${itemTotal.toFixed(2)}</span>
+                                <button class="remove-from-cart text-red-500 hover:text-red-700" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        `;
+                        cartItemsContainer.appendChild(cartItemElement);
+                    });
+                }
+                cartSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
+                cartItemCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartItemCount.classList.toggle('hidden', cart.length === 0);
+                
+                // Update WhatsApp link
+                const orderText = cart.map(item => {
+                    const displayQuantity = item.unit === 'kg' ? `${item.quantity * 250}g` : `x${item.quantity}`;
+                    return `${item.name} (${displayQuantity})`;
+                }).join('\n');
+
+                const upiId = "siddhantpunia96-1@oksbi"; // IMPORTANT: Replace with your actual UPI ID
+                const paymentLink = `upi://pay?pa=${upiId}&pn=Meethe&am=${subtotal.toFixed(2)}&cu=INR&tn=Order%20from%20Meethe`;
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentLink)}`;
+
+                const message = encodeURIComponent(
+`Hi! I'd like to place an order:
+${orderText}
+
+*Total Bill: ₹${subtotal.toFixed(2)}*
+
+Please provide the following details for delivery:
+- Name:
+- Hostel:
+- Room Number:
+
+You can pay using this QR Code link:
+${qrCodeUrl}`
+                );
+                whatsappOrderLink.href = `https://wa.me/919137734564?text=${message}`;
+            }
+
+            catalogGrid.addEventListener('click', e => {
+                const target = e.target.closest('button.add-to-cart-btn');
+                if (target) {
+                    const id = parseInt(target.dataset.id);
+                    addToCart(id);
                 }
             });
             
+            cartItemsContainer.addEventListener('click', e => {
+                 const removeBtn = e.target.closest('button.remove-from-cart');
+                 if(removeBtn) {
+                     removeFromCart(parseInt(removeBtn.dataset.id));
+                 }
+                 const changeBtn = e.target.closest('button.cart-quantity-change');
+                 if(changeBtn) {
+                     const id = parseInt(changeBtn.dataset.id);
+                     const change = parseInt(changeBtn.dataset.change);
+                     updateCartQuantity(id, change);
+                 }
+            });
+
             suggestionForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('review-name').value;
