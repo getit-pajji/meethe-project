@@ -409,7 +409,8 @@
                 onSnapshot(sweetsCollection, (snapshot) => {
                     sweetsData = [];
                     snapshot.forEach(doc => {
-                        sweetsData.push({ ...doc.data(), firestoreId: doc.id });
+                        // FIX: Use the firestore document ID as the primary ID for consistency.
+                        sweetsData.push({ id: doc.id, ...doc.data() });
                     });
                     renderCatalog();
                 }, (error) => {
@@ -624,7 +625,8 @@ ${qrCodeUrl}`
             catalogGrid.addEventListener('click', e => {
                 const target = e.target.closest('button.add-to-cart-btn');
                 if (target) {
-                    const id = parseInt(target.dataset.id);
+                    // FIX: Use the string ID directly from the data attribute.
+                    const id = target.dataset.id;
                     addToCart(id);
                 }
             });
@@ -632,11 +634,13 @@ ${qrCodeUrl}`
             cartItemsContainer.addEventListener('click', e => {
                  const removeBtn = e.target.closest('button.remove-from-cart');
                  if(removeBtn) {
-                     removeFromCart(parseInt(removeBtn.dataset.id));
+                     // FIX: Use the string ID directly.
+                     removeFromCart(removeBtn.dataset.id);
                  }
                  const changeBtn = e.target.closest('button.cart-quantity-change');
                  if(changeBtn) {
-                     const id = parseInt(changeBtn.dataset.id);
+                     // FIX: Use the string ID directly.
+                     const id = changeBtn.dataset.id;
                      const change = parseInt(changeBtn.dataset.change);
                      updateCartQuantity(id, change);
                  }
